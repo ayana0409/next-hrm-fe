@@ -2,13 +2,13 @@
 import { Button, Col, Divider, Form, Input, Row } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
 import { authenticate } from "@/utils/actions";
-import router from "next/router";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
   const [error, setError] = useState("");
+  const router = useRouter();
   const onFinish = async (values: { username: string; password: string }) => {
     const res = await authenticate(values.username, values.password);
 

@@ -18,13 +18,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             username: credentials.username,
             password: credentials.password,
           });
-          const user = response.data.data.user;
+          const user = response.data.user;
           if (user) {
             return {
               id: user.id,
               username: user.username,
               role: user.roles,
-              access_token: response.data.data.accessToken,
+              access_token: response.data.accessToken,
             };
           }
 
@@ -51,6 +51,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     session({ session, token }) {
       (session.user as IUser) = token.user;
       return session;
+    },
+    authorized: async ({ auth }) => {
+      return !!auth;
     },
   },
 });
