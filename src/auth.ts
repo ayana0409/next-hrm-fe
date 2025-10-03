@@ -50,6 +50,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     session({ session, token }) {
       (session.user as IUser) = token.user;
+      session.access_token = token.access_token;
       return session;
     },
     authorized: async ({ auth }) => {

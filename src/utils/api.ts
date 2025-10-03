@@ -7,13 +7,6 @@ const api = axios.create({
   },
 });
 
-// api.interceptors.request.use(async (config) => {
-//   const { data: session } = useSession();
-//   const token = session?.access_token || "";
-//   config.headers.Authorization = token ? `Bearer ${token}` : "";
-//   return config;
-// });
-
 api.interceptors.response.use(
   (response) => response.data,
   (error) => Promise.reject(error)
