@@ -1,26 +1,31 @@
 "use client";
 
-import { Card, Col, Row } from "antd";
+import { Button, Card, Col, message, Row } from "antd";
 
 const AdminCard = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   return (
-    <Row gutter={16}>
-      <Col span={8}>
-        <Card title="Card title" variant={"borderless"}>
-          Card content
-        </Card>
-      </Col>
-      <Col span={8}>
-        <Card title="Card title" variant={"borderless"}>
-          Card content
-        </Card>
-      </Col>
-      <Col span={8}>
-        <Card title="Card title" variant={"borderless"}>
-          Card content
-        </Card>
-      </Col>
-    </Row>
+    <>
+      {contextHolder}
+      <Button onClick={() => messageApi.error("Lỗi test!")}>Test Toast</Button>
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card title="Card title" variant={"borderless"}>
+            Card content
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" variant={"borderless"}>
+            Card content
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" variant={"borderless"}>
+            Card content
+          </Card>
+        </Col>
+      </Row>
+    </>
   );
 };
 

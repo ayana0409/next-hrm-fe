@@ -1,37 +1,32 @@
-import UserTable from "@/components/admin/user.table";
-import { axiosWithSession } from "@/library/axiosWithSession";
+// app/(admin)/dashboard/user/page.tsx
 import React from "react";
+import UserTable from "@/components/admin/user/user.table";
+import { getAllUser } from "@/components/admin/user/actions";
 
 interface IProp {
-  params: { id?: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-const ManageUserPage = async ({ params, searchParams }: IProp) => {
-  const current = searchParams?.current ?? "1";
-  const pageSize = searchParams?.pageSize ?? "1";
-  const api = await axiosWithSession();
-
-  const res = await api.get("user", {
-    params: {
-      current,
-      pageSize,
-    },
+const ManageUserPage = async ({ searchParams }: IProp) => {
+  const query = await searchParams;
+  const filters: Record<string, any> = {};
+  Object.entries(query).forEach(([key, value]) => {
+    if (!value) return;
+    if (Array.isArray(value)) {
+      filters[key] = value[0];
+    } else {
+      filters[key] = value;
+    }
   });
 
-  console.log("res", res);
+  filters.current = Number(filters.current ?? 1);
+  filters.pageSize = Number(filters.pageSize ?? 10);
+
+  const res = await getAllUser(filters);
 
   return (
     <div>
-      <UserTable
-        users={res.data.items}
-        meta={{
-          current: res.data.current,
-          pageSize: res.data.pageSize,
-          pages: res.data.totalPage,
-          totalItem: res.data.totalItem,
-        }}
-      />
+      <UserTable data={res.items} meta={res.meta} />
     </div>
   );
 };
