@@ -25,6 +25,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               username: user.username,
               role: user.roles,
               access_token: response.data.accessToken,
+              expiresIn: response.data.expiresIn,
             };
           }
 
@@ -42,15 +43,34 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/auth/login",
   },
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
+      // if (user) {
+      //   token.user = user as IUser;
+      //   return token;
+      // } else {""
+      //   return await refreshAccessToken(token);
+      // }
       if (user) {
         token.user = user as IUser;
+        token.access_token = (user as any).access_token;
+
+        token.accessTokenExpires = Date.now() + (user as any).expiresIn * 1000;
+        return token;
       }
-      return token;
+      if (!token.access_token) {
+        return token;
+      }
+      // 🔵 Nếu access token chưa hết hạn thì dùng lại
+      if (Date.now() < (token.accessTokenExpires as number)) {
+        return token;
+      }
+
+      return await refreshAccessToken(token);
     },
     session({ session, token }) {
       (session.user as IUser) = token.user;
       session.access_token = token.access_token;
+      session.error = token.error;
       return session;
     },
     authorized: async ({ auth }) => {
@@ -58,3 +78,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
 });
+
+async function refreshAccessToken(token: any) {
+  try {
+    console.log("Refreshing");
+    const response = await api.post("/auth/refresh");
+
+    const refreshed = response.data;
+    console.log("REF>>>>>>", refreshed);
+    return {
+      ...token,
+      access_token: refreshed.accessToken,
+      accessTokenExpires: Date.now() + 15 * 60 * 1000,
+    };
+  } catch (error) {
+    console.error("Refresh token failed", error);
+    return {
+      ...token,
+      error: "RefreshAccessTokenError",
+    };
+  }
+}
