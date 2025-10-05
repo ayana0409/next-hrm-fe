@@ -6,6 +6,7 @@ import { App } from "antd";
 import NextAuthWarpper from "@/library/next-auth.warpper";
 import "@/app/globals.css";
 import ReduxProvider from "@/provider/ReduxProvider";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="vi">
       <body className={inter.className}>
         <ReduxProvider>
+          <LoadingOverlay />
           <AntdRegistry>
             <App>
               <NextAuthWarpper>{children}</NextAuthWarpper>

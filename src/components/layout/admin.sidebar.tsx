@@ -4,6 +4,7 @@ import Menu from "antd/es/menu";
 import {
   AppstoreOutlined,
   MailOutlined,
+  ProfileOutlined,
   SettingOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
@@ -11,12 +12,15 @@ import React, { useContext } from "react";
 import { AdminContext } from "@/library/admin.context";
 import type { MenuProps } from "antd";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type MenuItem = Required<MenuProps>["items"][number];
 const AdminSideBar = () => {
   const { Sider } = Layout;
   const { collapseMenu } = useContext(AdminContext)!;
 
+  const pathname = usePathname();
+  console.log(pathname);
   const items: MenuItem[] = [
     {
       key: "grp",
@@ -24,14 +28,19 @@ const AdminSideBar = () => {
       type: "group",
       children: [
         {
-          key: "dashboard",
+          key: "/dashboard",
           label: <Link href={"/dashboard"}>Dashboard</Link>,
           icon: <AppstoreOutlined />,
         },
         {
-          key: "users",
+          key: "/dashboard/user",
           label: <Link href={"/dashboard/user"}>Manage Users</Link>,
           icon: <TeamOutlined />,
+        },
+        {
+          key: "/dashboard/department",
+          label: <Link href={"/dashboard/department"}>Manage Departments</Link>,
+          icon: <ProfileOutlined />,
         },
         {
           key: "sub1",
@@ -99,6 +108,7 @@ const AdminSideBar = () => {
         mode="inline"
         defaultSelectedKeys={["dashboard"]}
         items={items}
+        selectedKeys={[pathname]}
         style={{ height: "100vh" }}
       />
     </Sider>

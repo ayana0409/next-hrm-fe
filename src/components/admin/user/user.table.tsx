@@ -4,7 +4,6 @@ import CreateUserButton from "./createUser";
 import EditUserButton from "./editUser";
 import DeleteUserButton from "./deleteUser";
 import { CrudConfig } from "../../crud/crud-types";
-
 const userConfig: CrudConfig<any> = {
   entity: "User",
   columns: [

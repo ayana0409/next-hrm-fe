@@ -2,18 +2,21 @@
 import { Button, Modal, message } from "antd";
 import { useState } from "react";
 import { handleDelete } from "./actions";
+import { useRouter } from "next/navigation";
 
 export default function DeleteUserButton({ id }: { id: string }) {
   const [open, setOpen] = useState(false);
   const [msg, contextHolder] = message.useMessage();
+  const router = useRouter();
 
   const onConfirm = async () => {
     try {
       await handleDelete(id);
-      msg.success("Xoá thành công");
+      msg.success("Xoá thành công", 3);
       setOpen(false);
+      router.refresh();
     } catch (error: any) {
-      msg.error(error?.message || "Xoá thất bại");
+      msg.error(error?.message || "Xoá thất bại", 3);
     }
   };
 
