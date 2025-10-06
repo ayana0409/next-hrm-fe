@@ -7,7 +7,7 @@ import { CrudConfig } from "../../crud/crud-types";
 const tableConfig: CrudConfig<any> = {
   entity: "department",
   columns: [
-    { title: "Name", dataIndex: "name", key: "name" },
+    { title: "Name", dataIndex: "name", key: "name", fixed: true },
     { title: "Description", dataIndex: "description", key: "description" },
   ],
 };
