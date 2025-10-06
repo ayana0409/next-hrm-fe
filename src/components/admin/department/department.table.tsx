@@ -1,9 +1,10 @@
 "use client";
 import CrudTable from "../../crud/CrudTable";
-import CreateUserButton from "./createDepartment";
-import EditUserButton from "./editDepartment";
-import DeleteUserButton from "./deleteDepartmentr";
 import { CrudConfig } from "../../crud/crud-types";
+import DeleteDepartmentButton from "./deleteDepartment";
+import EditDepartmentButton from "./editDepartment";
+import CreateDepartmentButton from "./createDepartment";
+import { TableProps } from "@/types/table";
 const tableConfig: CrudConfig<any> = {
   entity: "department",
   columns: [
@@ -12,23 +13,18 @@ const tableConfig: CrudConfig<any> = {
   ],
 };
 
-export interface TableProps {
-  data: any[];
-  meta: any;
-}
-
 export default function DepartmentTable({ data, meta }: TableProps) {
   return (
     <div>
-      <CreateUserButton />
+      <CreateDepartmentButton />
       <CrudTable
         config={tableConfig}
         data={data}
         meta={meta}
         actions={(record) => (
           <>
-            <EditUserButton record={record} />
-            <DeleteUserButton id={record._id} />
+            <EditDepartmentButton record={record} />
+            <DeleteDepartmentButton id={record._id} />
           </>
         )}
       />

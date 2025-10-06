@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { startLoading, stopLoading } from "@/store/loadingSlice";
 import { useDispatch } from "react-redux";
 
-export default function EditUserButton({ record }: { record: any }) {
+export default function EditDepartmentButton({ record }: { record: any }) {
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
   const [msg, contextHolder] = message.useMessage();

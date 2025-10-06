@@ -4,7 +4,7 @@ import { useState } from "react";
 import { handleDelete } from "./actions";
 import { useRouter } from "next/navigation";
 
-export default function DeleteUserButton({ id }: { id: string }) {
+export default function DeleteDepartmentButton({ id }: { id: string }) {
   const [open, setOpen] = useState(false);
   const [msg, contextHolder] = message.useMessage();
   const router = useRouter();

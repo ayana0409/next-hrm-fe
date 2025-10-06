@@ -1,4 +1,5 @@
 "use client";
+import { TableProps } from "@/types/table";
 import CrudTable from "../../crud/CrudTable";
 import { CrudConfig } from "../../crud/crud-types";
 import CreatePositionButton from "./createPosition";
@@ -13,11 +14,6 @@ const tableConfig: CrudConfig<any> = {
     { title: "Description", dataIndex: "description", key: "description" },
   ],
 };
-
-export interface TableProps {
-  data: any[];
-  meta: any;
-}
 
 export default function PositionTable({ data, meta }: TableProps) {
   return (

@@ -4,6 +4,7 @@ import CreateUserButton from "./createUser";
 import EditUserButton from "./editUser";
 import DeleteUserButton from "./deleteUser";
 import { CrudConfig } from "../../crud/crud-types";
+import { TableProps } from "@/types/table";
 const userConfig: CrudConfig<any> = {
   entity: "User",
   columns: [
@@ -31,12 +32,7 @@ const userConfig: CrudConfig<any> = {
   ],
 };
 
-export interface UserTableProps {
-  data: any[];
-  meta: any;
-}
-
-export default function UserTable({ data, meta }: UserTableProps) {
+export default function UserTable({ data, meta }: TableProps) {
   return (
     <div>
       <CreateUserButton />
