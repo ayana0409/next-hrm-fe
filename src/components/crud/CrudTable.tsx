@@ -31,6 +31,8 @@ export default function CrudTable<T extends BaseRecord>({
           {
             title: "Actions",
             key: "actions",
+            fixed: "right",
+            width: 200,
             render: (_: any, record: T) => actions(record),
           },
         ]
@@ -38,23 +40,26 @@ export default function CrudTable<T extends BaseRecord>({
   ];
 
   return (
-    <Table
-      rowKey={(record: any) => record.id || record._id}
-      dataSource={data}
-      columns={columns}
-      pagination={{
-        current: meta.current,
-        pageSize: meta.pageSize,
-        total: meta.totalItem,
-        pageSizeOptions: ["10", "20", "50", "100"],
-        showSizeChanger: true,
-        onChange: (page, pageSize) => {
-          const query = new URLSearchParams(searchParams.toString());
-          query.set("current", String(page));
-          query.set("pageSize", String(pageSize));
-          router.push(`?${query.toString()}`);
-        },
-      }}
-    />
+    <div className="overflow-x-auto w-full">
+      <Table
+        rowKey={(record: any) => record.id || record._id}
+        dataSource={data}
+        scroll={{ x: 1000 }}
+        columns={columns}
+        pagination={{
+          current: meta.current,
+          pageSize: meta.pageSize,
+          total: meta.totalItem,
+          pageSizeOptions: ["10", "20", "50", "100"],
+          showSizeChanger: true,
+          onChange: (page, pageSize) => {
+            const query = new URLSearchParams(searchParams.toString());
+            query.set("current", String(page));
+            query.set("pageSize", String(pageSize));
+            router.push(`?${query.toString()}`);
+          },
+        }}
+      />
+    </div>
   );
 }

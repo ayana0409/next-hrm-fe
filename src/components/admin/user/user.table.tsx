@@ -7,11 +7,27 @@ import { CrudConfig } from "../../crud/crud-types";
 const userConfig: CrudConfig<any> = {
   entity: "User",
   columns: [
-    { title: "Fullname", dataIndex: ["employee", "fullName"], key: "fullname" },
-    { title: "Email", dataIndex: ["employee", "email"], key: "email" },
-    { title: "Phone", dataIndex: ["employee", "phone"], key: "phone" },
-    { title: "Username", dataIndex: "username", key: "username" },
-    { title: "Role", dataIndex: "role", key: "role" },
+    {
+      title: "Fullname",
+      dataIndex: ["employee", "fullName"],
+      key: "fullname",
+      fixed: true,
+      width: 300,
+    },
+    {
+      title: "Email",
+      dataIndex: ["employee", "email"],
+      key: "email",
+      width: 300,
+    },
+    {
+      title: "Phone",
+      dataIndex: ["employee", "phone"],
+      key: "phone",
+      width: 130,
+    },
+    { title: "Username", dataIndex: "username", key: "username", width: 300 },
+    { title: "Role", dataIndex: "role", key: "role", width: 100 },
   ],
 };
 
