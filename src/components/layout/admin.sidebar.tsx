@@ -43,6 +43,11 @@ const AdminSideBar = () => {
           icon: <ProfileOutlined />,
         },
         {
+          key: "/dashboard/position",
+          label: <Link href={"/dashboard/position"}>Manage Position</Link>,
+          icon: <TeamOutlined />,
+        },
+        {
           key: "sub1",
           label: "Navigation One",
           icon: <MailOutlined />,
