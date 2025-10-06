@@ -7,6 +7,7 @@ import NextAuthWarpper from "@/library/next-auth.warpper";
 import "@/app/globals.css";
 import ReduxProvider from "@/provider/ReduxProvider";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import SessionWatcher from "@/library/session-watcher";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,7 +28,9 @@ export default function RootLayout({
           <LoadingOverlay />
           <AntdRegistry>
             <App>
-              <NextAuthWarpper>{children}</NextAuthWarpper>
+              <NextAuthWarpper>
+                <SessionWatcher>{children}</SessionWatcher>
+              </NextAuthWarpper>
             </App>
           </AntdRegistry>
         </ReduxProvider>

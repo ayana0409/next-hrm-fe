@@ -90,6 +90,7 @@ async function refreshAccessToken(token: any) {
       ...token,
       access_token: refreshed.accessToken,
       accessTokenExpires: Date.now() + 15 * 60 * 1000,
+      error: undefined,
     };
   } catch (error) {
     console.error("Refresh token failed", error);
