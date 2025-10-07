@@ -1,13 +1,13 @@
-import NextAuth, { AuthError } from "next-auth";
+import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import api from "./utils/api";
 import { IUser } from "./types/next-auth";
+import { JWT } from "next-auth/jwt";
+import { isTokenExpired } from "./library/tokenExpiry";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
       credentials: {
         username: {},
         password: {},
@@ -18,22 +18,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             username: credentials.username,
             password: credentials.password,
           });
-          const user = response.data.user;
-          if (user) {
-            return {
-              id: user.id,
-              username: user.username,
-              role: user.roles,
-              access_token: response.data.accessToken,
-              expiresIn: response.data.expiresIn,
-            };
-          }
+          const { user, accessToken, expiresIn, refreshToken } = response.data;
+          if (!user || !accessToken) return null;
 
-          return null;
+          return {
+            id: user.id,
+            username: user.username,
+            role: user.roles,
+            access_token: accessToken,
+            expiresIn: expiresIn,
+            refresh_token: refreshToken,
+          };
         } catch (error: any) {
-          if (error.response?.status === 401) {
-            return null;
-          }
+          if (error.response?.status === 401) return null;
+
           return null;
         }
       },
@@ -43,57 +41,70 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/auth/login",
   },
   callbacks: {
-    async jwt({ token, user }) {
-      // if (user) {
-      //   token.user = user as IUser;
-      //   return token;
-      // } else {""
-      //   return await refreshAccessToken(token);
-      // }
-      if (user) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === "signIn" && user) {
         token.user = user as IUser;
         token.access_token = (user as any).access_token;
-
+        token.refresh_token = (user as any).refresh_token;
         token.accessTokenExpires = Date.now() + (user as any).expiresIn * 1000;
         return token;
       }
-      if (!token.access_token) {
+      if (trigger === "update" && session?.access_token) {
+        console.log("update");
+        token.access_token = session.access_token;
+        token.refresh_token = session.refresh_token;
+        token.access_expire = session.access_expire;
         return token;
       }
-      // 🔵 Nếu access token chưa hết hạn thì dùng lại
-      if (Date.now() < (token.accessTokenExpires as number)) {
-        return token;
-      }
+      if (!token.access_token) return token;
 
-      return await refreshAccessToken(token);
+      if (!isTokenExpired(token.access_token)) return token;
+
+      const refreshed = await refreshAccessToken(token as JWT);
+      if (!refreshed) return { ...token, error: "RefreshAccessTokenError" };
+
+      return refreshed;
     },
-    session({ session, token }) {
-      (session.user as IUser) = token.user;
-      session.access_token = token.access_token;
-      session.error = token.error;
+    async session({ session, token }) {
+      // map token fields into session for client consumption
+      session.access_token = token.access_token as string;
+      session.refresh_token = token.refresh_token as string;
+      session.accessTokenExpires = token.accessTokenExpires as number;
+      session.user = token.user as any;
+      session.error = token.error as string | undefined;
       return session;
     },
     authorized: async ({ auth }) => {
       return !!auth;
     },
   },
+  session: {
+    strategy: "jwt",
+    updateAge: 300000,
+    maxAge: 24 * 60 * 60,
+  },
 });
-
-async function refreshAccessToken(token: any) {
+export async function refreshAccessToken(token: JWT) {
   try {
-    console.log("Refreshing");
-    const response = await api.post("/auth/refresh");
+    const response = await api.post("/auth/refresh", {
+      refresh_token: token.refresh_token,
+    });
 
-    const refreshed = response.data;
-    console.log("REF>>>>>>", refreshed);
+    const { accessToken, expiresIn, refreshToken } = response.data;
+    if (!accessToken) return null;
+
+    if (refreshToken && refreshToken === token.refresh_token) return token;
+
     return {
       ...token,
-      access_token: refreshed.accessToken,
-      accessTokenExpires: Date.now() + 15 * 60 * 1000,
-      error: undefined,
+      access_token: accessToken,
+      accessTokenExpires: Date.now() + expiresIn * 1000,
+      refresh_token: refreshToken,
+      user: token.user,
     };
-  } catch (error) {
-    console.error("Refresh token failed", error);
+  } catch (error: any) {
+    console.log(error.message);
+
     return {
       ...token,
       error: "RefreshAccessTokenError",
