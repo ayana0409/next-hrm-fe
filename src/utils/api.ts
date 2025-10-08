@@ -14,3 +14,11 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+export const axiosAuth = axios.create({
+  baseURL: "http://localhost:8080/api/v1",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});

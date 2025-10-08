@@ -1,6 +1,5 @@
 "use client";
 import { Table } from "antd";
-import { CrudConfig } from "./crud-types";
 import { useSearchParams, useRouter } from "next/navigation";
 
 export interface BaseRecord {
@@ -9,14 +8,14 @@ export interface BaseRecord {
 }
 
 export interface CrudTableProps<T extends BaseRecord> {
-  config: CrudConfig<T>;
-  data: T[];
+  columns: any[];
+  data: T[] | undefined;
   meta: any;
-  actions?: (record: T) => React.ReactNode; // 👈 thêm custom actions slot
+  actions?: (record: T) => React.ReactNode;
 }
 
 export default function CrudTable<T extends BaseRecord>({
-  config,
+  columns,
   data,
   meta,
   actions,
@@ -24,8 +23,8 @@ export default function CrudTable<T extends BaseRecord>({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const columns = [
-    ...config.columns,
+  const columnsAction = [
+    ...columns,
     ...(actions
       ? [
           {
@@ -40,16 +39,15 @@ export default function CrudTable<T extends BaseRecord>({
   ];
 
   return (
-    <div className="overflow-x-auto w-full">
+    <div className="w-full overflow-x-auto">
       <Table
         rowKey={(record: any) => record.id || record._id}
         dataSource={data}
-        scroll={{ x: 1000 }}
-        columns={columns}
+        columns={columnsAction}
         pagination={{
-          current: meta.current,
-          pageSize: meta.pageSize,
-          total: meta.totalItem,
+          current: meta?.current,
+          pageSize: meta?.pageSize,
+          total: meta?.totalItem,
           pageSizeOptions: ["10", "20", "50", "100"],
           showSizeChanger: true,
           onChange: (page, pageSize) => {
@@ -59,6 +57,8 @@ export default function CrudTable<T extends BaseRecord>({
             router.push(`?${query.toString()}`);
           },
         }}
+        scroll={{ x: "max-content" }} // cho phép cuộn ngang theo nội dung
+        style={{ width: "100%" }}
       />
     </div>
   );

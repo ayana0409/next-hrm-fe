@@ -1,10 +1,13 @@
 "use client";
-import { Button, Form, Input, Modal, Select, message } from "antd";
+import { Button, Form, Modal, message } from "antd";
 import { useState } from "react";
-import { handleAdd } from "./actions";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/store/loadingSlice";
+import { useAxiosAuth } from "@/utils/customHook";
+import { DEPARTMENT_ENDPOINT, DEPARTMENT_FIELDS } from "./department.const";
+import { fieldsToArray } from "@/utils/fields";
+import { AutoFormFields } from "@/components/crud/AutoFormFields";
 
 export default function CreateDepartmentButton() {
   const [open, setOpen] = useState(false);
@@ -12,19 +15,23 @@ export default function CreateDepartmentButton() {
   const [msg, contextHolder] = message.useMessage();
   const router = useRouter();
   const dispatch = useDispatch();
+  const axiosAuth = useAxiosAuth();
+  const fieldList = fieldsToArray(DEPARTMENT_FIELDS);
 
   const onSubmit = async () => {
+    const values = await form.validateFields();
     dispatch(startLoading());
-    try {
-      const values = await form.validateFields();
-      await handleAdd(values);
-      msg.success("Add successful");
-      setOpen(false);
-      form.resetFields();
-      router.refresh();
-    } catch (error: any) {
-      msg.error(error?.message || "Add failed");
-    }
+    await axiosAuth
+      .post(DEPARTMENT_ENDPOINT, values)
+      .then(() => {
+        msg.success("Add successful");
+        setOpen(false);
+        form.resetFields();
+        router.refresh();
+      })
+      .catch((error) => {
+        msg.error(error?.response.data.message || "Add failed");
+      });
     dispatch(stopLoading());
   };
 
@@ -42,16 +49,7 @@ export default function CreateDepartmentButton() {
         onCancel={() => setOpen(false)}
       >
         <Form form={form} layout="vertical">
-          <Form.Item
-            name="name"
-            label="Name"
-            rules={[{ required: true, message: "Field name is required" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item name="description" label="Description">
-            <Input.TextArea />
-          </Form.Item>
+          <AutoFormFields fields={fieldList} />
         </Form>
       </Modal>
     </>

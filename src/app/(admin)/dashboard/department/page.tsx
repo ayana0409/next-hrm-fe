@@ -1,7 +1,5 @@
 // app/(admin)/dashboard/user/page.tsx
 import React from "react";
-import UserTable from "@/components/admin/user/user.table";
-import { getAllDepartment } from "@/components/admin/department/actions";
 import DepartmentTable from "@/components/admin/department/department.table";
 
 interface IProp {
@@ -23,11 +21,9 @@ const ManageDepartmentPage = async ({ searchParams }: IProp) => {
   filters.current = Number(filters.current ?? 1);
   filters.pageSize = Number(filters.pageSize ?? 10);
 
-  const res = await getAllDepartment(filters);
-
   return (
     <div>
-      <DepartmentTable data={res.items} meta={res.meta} />
+      <DepartmentTable filters={filters} data={[]} meta={""} />
     </div>
   );
 };

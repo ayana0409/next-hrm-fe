@@ -3,7 +3,6 @@ import Credentials from "next-auth/providers/credentials";
 import api from "./utils/api";
 import { IUser } from "./types/next-auth";
 import { JWT } from "next-auth/jwt";
-import { isTokenExpired } from "./library/tokenExpiry";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -26,7 +25,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             username: user.username,
             role: user.roles,
             access_token: accessToken,
-            expiresIn: expiresIn,
             refresh_token: refreshToken,
           };
         } catch (error: any) {
@@ -46,30 +44,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.user = user as IUser;
         token.access_token = (user as any).access_token;
         token.refresh_token = (user as any).refresh_token;
-        token.accessTokenExpires = Date.now() + (user as any).expiresIn * 1000;
         return token;
       }
-      if (trigger === "update" && session?.access_token) {
-        console.log("update");
-        token.access_token = session.access_token;
-        token.refresh_token = session.refresh_token;
-        token.access_expire = session.access_expire;
-        return token;
-      }
-      if (!token.access_token) return token;
-
-      if (!isTokenExpired(token.access_token)) return token;
-
-      const refreshed = await refreshAccessToken(token as JWT);
-      if (!refreshed) return { ...token, error: "RefreshAccessTokenError" };
-
-      return refreshed;
+      return { ...token, ...user };
     },
     async session({ session, token }) {
       // map token fields into session for client consumption
       session.access_token = token.access_token as string;
       session.refresh_token = token.refresh_token as string;
-      session.accessTokenExpires = token.accessTokenExpires as number;
       session.user = token.user as any;
       session.error = token.error as string | undefined;
       return session;
@@ -80,18 +62,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   session: {
     strategy: "jwt",
-    updateAge: 300000,
+    // updateAge: 300000,
     maxAge: 24 * 60 * 60,
   },
 });
-export async function refreshAccessToken(token: JWT) {
+async function refreshAccessToken(token: JWT) {
   try {
+    console.log("Old", token.refresh_token);
     const response = await api.post("/auth/refresh", {
       refresh_token: token.refresh_token,
     });
 
     const { accessToken, expiresIn, refreshToken } = response.data;
     if (!accessToken) return null;
+    console.log("new", refreshToken);
 
     if (refreshToken && refreshToken === token.refresh_token) return token;
 

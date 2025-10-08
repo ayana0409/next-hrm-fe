@@ -1,11 +1,14 @@
+"use client";
 import { axiosWithSession } from "@/library/axiosWithSession";
+import { useAxiosAuth } from "@/utils/customHook";
 import { ApiError } from "next/dist/server/api-utils";
 
 export function createBaseApi(endpoint: string) {
   return {
     async getAll(params?: any) {
       const api = await axiosWithSession();
-      const res = await api.get(endpoint, { params });
+      const axiosAuth = useAxiosAuth();
+      const res = await axiosAuth.get(endpoint, { params });
       return {
         items: res.data.items,
         meta: {

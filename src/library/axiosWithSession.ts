@@ -7,36 +7,67 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 
-/* ---------- config ---------- */
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080/api/v1";
-const WAIT_FOR_TOKEN_MS = 10000; // thời gian đợi auth broadcast token mới
+const WAIT_FOR_TOKEN_MS = 10000;
 
-/* ---------- storage helpers (client) ---------- */
+/* ---------- Storage helpers (client-only) ---------- */
+function isClient() {
+  return typeof window !== "undefined";
+}
+
 function getStoredAccessToken(): string | null {
-  if (typeof window === "undefined") return null;
+  if (!isClient()) return null;
   return localStorage.getItem("access_token");
 }
-function clearStoredTokens() {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("refresh_token");
+
+function getStoredRefreshToken(): string | null {
+  if (!isClient()) return null;
+  return localStorage.getItem("refresh_token");
 }
 
-/* ---------- helpers: wait for auth token update (BroadcastChannel + storage fallback) ---------- */
+function setStoredTokens(accessToken: string, refreshToken?: string) {
+  if (!isClient()) return;
+  try {
+    localStorage.setItem("access_token", accessToken);
+    if (refreshToken) localStorage.setItem("refresh_token", refreshToken);
+  } catch {}
+  broadcastTokenUpdate();
+}
+
+function clearStoredTokens() {
+  if (!isClient()) return;
+  try {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+  } catch {}
+}
+
+/* ---------- Broadcast ---------- */
+function broadcastTokenUpdate() {
+  if (!isClient()) return;
+  try {
+    const bc = new BroadcastChannel("auth");
+    bc.postMessage({ type: "token-updated", ts: Date.now() });
+    bc.close();
+  } catch {}
+  try {
+    localStorage.setItem("auth:token_updated", String(Date.now()));
+  } catch {}
+}
+
+/* ---------- Wait for token update (used by requests waiting) ---------- */
 function waitForTokenUpdate(
   timeoutMs = WAIT_FOR_TOKEN_MS
 ): Promise<string | null> {
   return new Promise((resolve) => {
-    if (typeof window === "undefined") return resolve(null);
+    if (!isClient()) return resolve(null);
 
     let resolved = false;
-    // If BroadcastChannel available, use it
     let bc: BroadcastChannel | null = null;
     try {
-      if (typeof BroadcastChannel !== "undefined") {
+      if (typeof BroadcastChannel !== "undefined")
         bc = new BroadcastChannel("auth");
-      }
     } catch {
       bc = null;
     }
@@ -55,10 +86,8 @@ function waitForTokenUpdate(
 
     const onMessage = (ev: MessageEvent) => {
       try {
-        const data = ev.data;
-        if (data?.type === "token-updated") {
-          const t = getStoredAccessToken();
-          return finish(t);
+        if (ev.data?.type === "token-updated") {
+          return finish(getStoredAccessToken());
         }
       } catch {}
     };
@@ -66,25 +95,69 @@ function waitForTokenUpdate(
     const onStorage = (ev: StorageEvent) => {
       try {
         if (ev.key === "auth:token_updated") {
-          const t = getStoredAccessToken();
-          return finish(t);
+          return finish(getStoredAccessToken());
         }
       } catch {}
     };
 
     const timer = setTimeout(() => finish(null), timeoutMs);
 
-    if (bc) {
-      bc.onmessage = onMessage;
-    }
+    if (bc) bc.onmessage = onMessage;
     window.addEventListener("storage", onStorage);
   });
 }
 
-/* ---------- module-scoped singleton ---------- */
+/* ---------- Single-flight refresh helper ---------- */
+let refreshPromise: Promise<string | null> | null = null;
+
+async function performRefresh(): Promise<string | null> {
+  if (!isClient()) return null;
+
+  // reuse ongoing refresh
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    try {
+      const refreshToken = getStoredRefreshToken();
+      if (!refreshToken) return null;
+
+      // Call your refresh endpoint (must be same-origin or CORS allowing credentials)
+      const res = await fetch(`${BASE_URL}/auth/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!res.ok) {
+        return null;
+      }
+
+      const body = await res.json();
+      const newAccess = body.accessToken ?? body.access_token;
+      const newRefresh = body.refreshToken ?? body.refresh_token;
+
+      if (!newAccess) return null;
+
+      setStoredTokens(newAccess, newRefresh);
+      return newAccess;
+    } catch (err) {
+      console.warn("performRefresh failed", err);
+      return null;
+    } finally {
+      // allow next refresh after this settles
+      setTimeout(() => {
+        refreshPromise = null;
+      }, 0);
+    }
+  })();
+
+  return refreshPromise;
+}
+
+/* ---------- Axios instance ---------- */
 let axiosInstance: AxiosInstance | null = null;
 
-/* ---------- create singleton axios instance ---------- */
 export function axiosWithSession(): AxiosInstance {
   if (axiosInstance) return axiosInstance;
 
@@ -94,42 +167,22 @@ export function axiosWithSession(): AxiosInstance {
     withCredentials: true,
   });
 
-  // Request interceptor: always read token from storage before sending
-  instance.interceptors.request.use(
-    async (
-      config: InternalAxiosRequestConfig
-    ): Promise<InternalAxiosRequestConfig> => {
+  // Request interceptor: only client-side attach token from storage
+  instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+    if (isClient()) {
+      const access = getStoredAccessToken();
       const hdrs = new AxiosHeaders(config.headers as any);
-
-      if (typeof window === "undefined") {
-        // server-side: use next-auth auth() if available
-        try {
-          const session = await auth();
-          const serverToken =
-            (session as any)?.access_token ?? (session as any)?.accessToken;
-          if (serverToken) hdrs.set("Authorization", `Bearer ${serverToken}`);
-          else hdrs.delete("Authorization");
-        } catch {
-          hdrs.delete("Authorization");
-        }
-      } else {
-        // client-side: always read the latest from localStorage
-        const access = getStoredAccessToken();
-        if (access) {
-          hdrs.set("Authorization", `Bearer ${access}`);
-        } else {
-          hdrs.delete("Authorization");
-        }
-      }
-
-      config.headers = hdrs as unknown as InternalAxiosRequestConfig["headers"];
-      return config;
+      if (access) hdrs.set("Authorization", `Bearer ${access}`);
+      else hdrs.delete("Authorization");
+      config.headers = hdrs as any;
     }
-  );
+    return config;
+  });
 
-  // Response interceptor: on 401 wait for auth module to provide updated token (do NOT call refresh endpoint here)
+  // Response interceptor: handle 401 -> attempt immediate retry with latest storage token,
+  // then wait for broadcast or attempt refresh if needed.
   instance.interceptors.response.use(
-    (res) => res.data ?? res,
+    (res) => res,
     async (
       error: AxiosError & {
         config?: InternalAxiosRequestConfig & { _retry?: boolean };
@@ -139,29 +192,33 @@ export function axiosWithSession(): AxiosInstance {
       const status = error?.response?.status;
 
       if (!originalRequest || status !== 401) return Promise.reject(error);
-
-      // Avoid retry loops
       if (originalRequest._retry) return Promise.reject(error);
       originalRequest._retry = true;
 
-      console.log("[response] caught 401 for", originalRequest.url);
+      // If server-side call triggered axios, bail out (can't handle client token here)
+      if (!isClient()) return Promise.reject(error);
 
-      // 1) Maybe session already updated in storage by auth module
-      const latest = getStoredAccessToken();
-      if (latest) {
-        // Compare suffix to the Authorization header of originalRequest if present
-        try {
+      console.log("[axiosWithSession] caught 401 for", originalRequest.url);
+
+      // 1) If storage already has a newer token than the one used in header, retry immediately
+      try {
+        const latest = getStoredAccessToken();
+        if (latest) {
           const usedAuth =
             (originalRequest.headers as any)?.Authorization ??
             (originalRequest.headers as any)?.authorization ??
             null;
-          const usedSuffix =
-            typeof usedAuth === "string" ? usedAuth.slice(-8) : null;
-          const latestSuffix = latest.slice(-8);
-          // if latest differs from used token, retry immediately with latest
+          const usedToken =
+            typeof usedAuth === "string" && usedAuth.startsWith("Bearer ")
+              ? usedAuth.slice(7)
+              : null;
+
+          const usedSuffix = usedToken?.slice(-12) ?? null;
+          const latestSuffix = latest.slice(-12);
+
           if (!usedSuffix || usedSuffix !== latestSuffix) {
             console.log(
-              "[response] storage token differs from used token, retry with new token (suffix):",
+              "[axiosWithSession] storage token differs, retrying with latest (suffix):",
               latestSuffix
             );
             const hdrs = new AxiosHeaders(originalRequest.headers as any);
@@ -170,39 +227,73 @@ export function axiosWithSession(): AxiosInstance {
             instance.defaults.headers.common[
               "Authorization"
             ] = `Bearer ${latest}`;
-            return instance(originalRequest);
+            return instance.request(originalRequest);
           }
-        } catch {}
+        }
+      } catch (err) {
+        console.warn("[axiosWithSession] token compare failed", err);
       }
 
-      // 2) Wait for auth module to broadcast token update
+      // 2) If some other tab is refreshing, wait for token update
       console.log(
-        "[response] waiting for auth token update (up to ms):",
+        "[axiosWithSession] waiting for token update (ms):",
         WAIT_FOR_TOKEN_MS
       );
-      const newTok = await waitForTokenUpdate(WAIT_FOR_TOKEN_MS);
-
-      if (newTok) {
-        console.log(
-          "[response] received token update (suffix):",
-          newTok.slice(-8)
-        );
+      const tokenFromBroadcast = await waitForTokenUpdate(WAIT_FOR_TOKEN_MS);
+      if (tokenFromBroadcast) {
+        console.log("[axiosWithSession] got token from broadcast, retrying");
         const hdrs = new AxiosHeaders(originalRequest.headers as any);
-        hdrs.set("Authorization", `Bearer ${newTok}`);
+        hdrs.set("Authorization", `Bearer ${tokenFromBroadcast}`);
         originalRequest.headers = hdrs as any;
-        instance.defaults.headers.common["Authorization"] = `Bearer ${newTok}`;
-        return instance(originalRequest);
+        instance.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${tokenFromBroadcast}`;
+        return instance.request(originalRequest);
       }
 
-      // 3) timeout or no token update -> clear and redirect to login
-      console.log(
-        "[response] no token update received within timeout, redirecting to login"
-      );
-      if (typeof window !== "undefined") {
-        clearStoredTokens();
-        window.location.href = "/auth/login";
+      // 3) No broadcast: attempt to refresh here (single-flight)
+      console.log("[axiosWithSession] attempting refresh");
+      const refreshed = await performRefresh();
+      if (refreshed) {
+        console.log("[axiosWithSession] refresh succeeded, retrying");
+        const hdrs = new AxiosHeaders(originalRequest.headers as any);
+        hdrs.set("Authorization", `Bearer ${refreshed}`);
+        originalRequest.headers = hdrs as any;
+        instance.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${refreshed}`;
+        return instance.request(originalRequest);
       }
-      return Promise.reject(error);
+
+      // 4) Refresh failed: logout + redirect
+      console.log(
+        "[axiosWithSession] refresh failed, logging out and redirecting to login"
+      );
+      try {
+        await fetch(`${BASE_URL}/auth/logout`, {
+          method: "POST",
+          credentials: "include",
+        });
+      } catch (err) {
+        console.warn("logout api failed", err);
+      }
+
+      clearStoredTokens();
+
+      // small delay to ensure storage event/broadcast processed
+      setTimeout(() => {
+        if (isClient()) {
+          window.location.href = "/auth/login";
+        }
+      }, 50);
+
+      return Promise.reject(
+        new AxiosError(
+          "Session expired, redirected to login",
+          "401",
+          error.config
+        )
+      );
     }
   );
 

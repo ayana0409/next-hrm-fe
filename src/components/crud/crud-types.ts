@@ -1,6 +1,11 @@
-import { Rule } from "antd/es/form";
+export interface ResponseMeta {
+  current: number;
+  pageSize: number;
+  pages: number;
+  totalItem: number;
+}
 
-export type CrudConfig<T> = {
-  entity: string;
-  columns: any[];
-};
+export interface PagingResponse {
+  items: any[];
+  meta: ResponseMeta;
+}
