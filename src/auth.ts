@@ -2,7 +2,6 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import api from "./utils/api";
 import { IUser } from "./types/next-auth";
-import { JWT } from "next-auth/jwt";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -66,32 +65,3 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     maxAge: 24 * 60 * 60,
   },
 });
-async function refreshAccessToken(token: JWT) {
-  try {
-    console.log("Old", token.refresh_token);
-    const response = await api.post("/auth/refresh", {
-      refresh_token: token.refresh_token,
-    });
-
-    const { accessToken, expiresIn, refreshToken } = response.data;
-    if (!accessToken) return null;
-    console.log("new", refreshToken);
-
-    if (refreshToken && refreshToken === token.refresh_token) return token;
-
-    return {
-      ...token,
-      access_token: accessToken,
-      accessTokenExpires: Date.now() + expiresIn * 1000,
-      refresh_token: refreshToken,
-      user: token.user,
-    };
-  } catch (error: any) {
-    console.log(error.message);
-
-    return {
-      ...token,
-      error: "RefreshAccessTokenError",
-    };
-  }
-}

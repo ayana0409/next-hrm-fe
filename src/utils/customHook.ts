@@ -92,7 +92,6 @@ export const useRefreshToken = () => {
 
       const { accessToken, refreshToken } = res.data;
 
-      // Cập nhật session bằng cách gọi signIn với credentials mới
       if (session) {
         session.access_token = accessToken;
         session.refresh_token = refreshToken;
