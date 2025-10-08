@@ -1,10 +1,11 @@
 "use client";
 import { Button, Form, Input, Modal, Select, message } from "antd";
 import { useState } from "react";
-import { handleEdit } from "./actions";
 import { useRouter } from "next/navigation";
 import { startLoading, stopLoading } from "@/store/loadingSlice";
 import { useDispatch } from "react-redux";
+import { USER_ENDPOINT } from "./user.const";
+import { useAxiosAuth } from "@/utils/customHook";
 
 export default function EditUserButton({ record }: { record: any }) {
   const [open, setOpen] = useState(false);
@@ -12,18 +13,22 @@ export default function EditUserButton({ record }: { record: any }) {
   const [msg, contextHolder] = message.useMessage();
   const router = useRouter();
   const dispatch = useDispatch();
+  const axiosAuth = useAxiosAuth();
 
   const onSubmit = async () => {
+    const values = await form.validateFields();
     dispatch(startLoading());
-    try {
-      const values = await form.validateFields();
-      await handleEdit(record._id, values);
-      msg.success("Update user successul");
-      setOpen(false);
-      router.refresh();
-    } catch (error: any) {
-      msg.error(error?.message || "Update user failed");
-    }
+    axiosAuth
+      .patch(`${USER_ENDPOINT}/${record._id}`, values)
+      .then(() => {
+        router.refresh();
+        msg.success("Update successul");
+        setOpen(false);
+      })
+      .catch((error) => {
+        msg.error(error?.response.data.message || "Update failed");
+      });
+
     dispatch(stopLoading());
   };
 
@@ -41,7 +46,7 @@ export default function EditUserButton({ record }: { record: any }) {
         Edit
       </Button>
       <Modal
-        title="Sửa người dùng"
+        title="Update User"
         open={open}
         onOk={onSubmit}
         onCancel={() => setOpen(false)}
@@ -53,8 +58,9 @@ export default function EditUserButton({ record }: { record: any }) {
           <Form.Item name="role" label="Role">
             <Select
               options={[
+                { label: "Employee", value: "employee" },
+                { label: "Manager", value: "manager" },
                 { label: "Admin", value: "admin" },
-                { label: "User", value: "user" },
               ]}
             />
           </Form.Item>

@@ -5,13 +5,23 @@ export interface TableProps {
 export type FieldDef = {
   title: string;
   key: string;
-  dataIndex?: string;
+  dataIndex?: string[] | string;
   index: number;
   fixed?: boolean;
-  inputType?: "input" | "textarea" | "number" | "select" | "date" | "checkbox";
   required?: boolean;
   placeholder?: string;
   width?: number;
+
+  hidden?: boolean; // hidden on table
+
+  inputType?:
+    | "input"
+    | "textarea"
+    | "number"
+    | "select"
+    | "date"
+    | "checkbox"
+    | "password";
 
   // for number type
   min?: number; // default: 0

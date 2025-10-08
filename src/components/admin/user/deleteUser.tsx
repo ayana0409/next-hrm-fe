@@ -1,23 +1,27 @@
 "use client";
 import { Button, Modal, message } from "antd";
 import { useState } from "react";
-import { handleDelete } from "./actions";
 import { useRouter } from "next/navigation";
+import { useAxiosAuth } from "@/utils/customHook";
+import { USER_ENDPOINT } from "./user.const";
 
 export default function DeleteUserButton({ id }: { id: string }) {
   const [open, setOpen] = useState(false);
   const [msg, contextHolder] = message.useMessage();
   const router = useRouter();
+  const axiosAuth = useAxiosAuth();
 
   const onConfirm = async () => {
-    try {
-      await handleDelete(id);
-      msg.success("Xoá thành công", 3);
-      setOpen(false);
-      router.refresh();
-    } catch (error: any) {
-      msg.error(error?.message || "Xoá thất bại", 3);
-    }
+    await axiosAuth
+      .delete(`${USER_ENDPOINT}/${id}`)
+      .then(() => {
+        router.refresh();
+        msg.success("Delete successful", 3);
+        setOpen(false);
+      })
+      .catch((error) => {
+        msg.error(error?.response.data.message || "Delete failed", 3);
+      });
   };
 
   return (

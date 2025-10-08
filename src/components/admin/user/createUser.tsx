@@ -1,10 +1,11 @@
 "use client";
 import { Button, Form, Input, Modal, Select, message } from "antd";
 import { useState } from "react";
-import { handleAdd } from "./actions";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/store/loadingSlice";
+import { USER_ENDPOINT, USER_FIELDS } from "./user.const";
+import { useAxiosAuth } from "@/utils/customHook";
 
 export default function CreateUserButton() {
   const [open, setOpen] = useState(false);
@@ -12,19 +13,28 @@ export default function CreateUserButton() {
   const [msg, contextHolder] = message.useMessage();
   const router = useRouter();
   const dispatch = useDispatch();
+  const axiosAuth = useAxiosAuth();
 
   const onSubmit = async () => {
-    dispatch(startLoading("Đang thêm người dùng..."));
-    try {
-      const values = await form.validateFields();
-      await handleAdd(values);
-      msg.success("Thêm người dùng thành công");
-      setOpen(false);
-      form.resetFields();
-      router.refresh();
-    } catch (error: any) {
-      msg.error(error?.message || "Thêm thất bại");
+    const values = await form.validateFields();
+    if (String(values.password) !== String(values.confirmPassword)) {
+      msg.error("Mật khẩu xác nhận không khớp");
+      dispatch(stopLoading());
+      return;
     }
+    delete values.confirmPassword;
+    dispatch(startLoading());
+    await axiosAuth
+      .post(USER_ENDPOINT, values)
+      .then(() => {
+        msg.success("Add successful");
+        setOpen(false);
+        form.resetFields();
+        router.refresh();
+      })
+      .catch((error) => {
+        msg.error(error?.response.data.message || "Add failed");
+      });
     dispatch(stopLoading());
   };
 
@@ -57,7 +67,7 @@ export default function CreateUserButton() {
             <Input.Password />
           </Form.Item>
           <Form.Item
-            name="confirmedPassword"
+            name="confirmPassword"
             label="Confirm Password"
             rules={[
               { required: true, message: "Xác nhận mật khẩu là bắt buộc" },
@@ -68,8 +78,9 @@ export default function CreateUserButton() {
           <Form.Item name="role" label="Role">
             <Select
               options={[
+                { label: "Employee", value: "employee" },
+                { label: "Manager", value: "manager" },
                 { label: "Admin", value: "admin" },
-                { label: "User", value: "user" },
               ]}
             />
           </Form.Item>

@@ -42,21 +42,59 @@ export function AutoFormFields({ fields }: { fields: FieldDef[] }) {
                     />
                   );
 
-                case "select":
+                case "select": {
+                  // Nếu options là mảng object dùng luôn,
+                  // nếu là mảng string thì map sang { label, value },
+                  // nếu là string (key) thì cố gắng lấy từ f.optionsMap nếu có
+                  const raw = (f as any).options;
+                  let opts: { label: string; value: any }[] = [];
+
+                  if (Array.isArray(raw)) {
+                    opts =
+                      raw.length && typeof raw[0] === "object"
+                        ? (raw as { label: string; value: any }[])
+                        : (raw as string[]).map((v) => ({
+                            label:
+                              String(v).charAt(0).toUpperCase() +
+                              String(v).slice(1),
+                            value: v,
+                          }));
+                  } else if (
+                    typeof raw === "string" &&
+                    (f as any).optionsMap &&
+                    typeof (f as any).optionsMap === "object"
+                  ) {
+                    const mapped = (f as any).optionsMap[raw];
+                    if (Array.isArray(mapped)) {
+                      opts =
+                        mapped.length && typeof mapped[0] === "object"
+                          ? mapped
+                          : (mapped as string[]).map((v) => ({
+                              label: String(v),
+                              value: v,
+                            }));
+                    }
+                  }
+
+                  // fallback: nếu không có options hợp lệ thì rỗng
                   return (
                     <Select
                       placeholder={f.placeholder}
-                      options={f.options ?? []}
+                      options={opts}
                       allowClear={f.allowClear ?? true}
                       style={{ width: "100%" }}
                     />
                   );
+                }
 
                 case "date":
                   return <DatePicker style={{ width: "100%" }} />;
 
                 case "checkbox":
                   return <Checkbox>{f.checkboxLabel ?? f.title}</Checkbox>;
+
+                case "password":
+                  return <Input.Password placeholder={f.placeholder} />;
 
                 // case "custom":
                 //   return f.render ? f.render() : null;

@@ -3,43 +3,53 @@ import CrudTable from "../../crud/CrudTable";
 import CreateUserButton from "./createUser";
 import EditUserButton from "./editUser";
 import DeleteUserButton from "./deleteUser";
-import { CrudConfig } from "../../crud/crud-types";
+import { PagingResponse } from "../../crud/crud-types";
 import { TableProps } from "@/types/table";
-const userConfig: CrudConfig<any> = {
-  entity: "User",
-  columns: [
-    {
-      title: "Fullname",
-      dataIndex: ["employee", "fullName"],
-      key: "fullname",
-      fixed: true,
-      width: 300,
-    },
-    {
-      title: "Email",
-      dataIndex: ["employee", "email"],
-      key: "email",
-      width: 300,
-    },
-    {
-      title: "Phone",
-      dataIndex: ["employee", "phone"],
-      key: "phone",
-      width: 130,
-    },
-    { title: "Username", dataIndex: "username", key: "username", width: 300 },
-    { title: "Role", dataIndex: "role", key: "role", width: 100 },
-  ],
-};
+import { USER_ENDPOINT, USER_FIELDS } from "./user.const";
+import { startLoading, stopLoading } from "@/store/loadingSlice";
+import { useAxiosAuth } from "@/utils/customHook";
+import { fieldsToColumns, fieldsToArray } from "@/utils/fields";
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 
-export default function UserTable({ data, meta }: TableProps) {
+const columns = fieldsToColumns(fieldsToArray(USER_FIELDS, true));
+
+export default function UserTable({ filters }: TableProps) {
+  const { data: session, status } = useSession({ required: true });
+  const axiosAuth = useAxiosAuth();
+  const [data, setData] = useState<PagingResponse>();
+  const dispatch = useDispatch();
+
+  const fetchData = async () => {
+    await axiosAuth.get(USER_ENDPOINT, { params: filters }).then((res) => {
+      const { items, current, pageSize, pages, totalItem } = res.data.data;
+      setData({
+        items,
+        meta: {
+          current,
+          pageSize,
+          pages,
+          totalItem,
+        },
+      });
+    });
+  };
+
+  useEffect(() => {
+    dispatch(startLoading());
+    if (status === "authenticated" && session?.access_token) {
+      fetchData();
+      dispatch(stopLoading());
+    }
+  }, [status, session, filters]);
   return (
     <div>
       <CreateUserButton />
       <CrudTable
-        config={userConfig}
-        data={data}
-        meta={meta}
+        columns={columns}
+        items={data?.items}
+        meta={data?.meta}
         actions={(record) => (
           <>
             <EditUserButton record={record} />
