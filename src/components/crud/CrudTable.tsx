@@ -9,14 +9,14 @@ export interface BaseRecord {
 
 export interface CrudTableProps<T extends BaseRecord> {
   columns: any[];
-  data: T[] | undefined;
+  items: T[] | undefined;
   meta: any;
   actions?: (record: T) => React.ReactNode;
 }
 
 export default function CrudTable<T extends BaseRecord>({
   columns,
-  data,
+  items,
   meta,
   actions,
 }: CrudTableProps<T>) {
@@ -42,7 +42,7 @@ export default function CrudTable<T extends BaseRecord>({
     <div className="w-full overflow-x-auto">
       <Table
         rowKey={(record: any) => record.id || record._id}
-        dataSource={data}
+        dataSource={items}
         columns={columnsAction}
         pagination={{
           current: meta?.current,

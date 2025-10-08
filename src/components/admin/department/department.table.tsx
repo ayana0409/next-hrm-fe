@@ -51,7 +51,7 @@ export default function DepartmentTable({ filters }: TableProps) {
       <CreateDepartmentButton />
       <CrudTable
         columns={columns}
-        data={data?.items}
+        items={data?.items}
         meta={data?.meta}
         actions={(record) => (
           <>

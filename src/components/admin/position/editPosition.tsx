@@ -1,10 +1,13 @@
 "use client";
-import { Button, Form, Input, Modal, Select, message } from "antd";
+import { Button, Form, Modal, message } from "antd";
 import { useState } from "react";
-import { handleEdit } from "./actions";
 import { useRouter } from "next/navigation";
 import { startLoading, stopLoading } from "@/store/loadingSlice";
 import { useDispatch } from "react-redux";
+import { POSITION_ENDPOINT, POSITION_FIELDS } from "./position.const";
+import { AutoFormFields } from "@/components/crud/AutoFormFields";
+import { useAxiosAuth } from "@/utils/customHook";
+import { fieldsToArray } from "@/utils/fields";
 
 export default function EditPositionButton({ record }: { record: any }) {
   const [open, setOpen] = useState(false);
@@ -12,21 +15,25 @@ export default function EditPositionButton({ record }: { record: any }) {
   const [msg, contextHolder] = message.useMessage();
   const router = useRouter();
   const dispatch = useDispatch();
+  const axiosAuth = useAxiosAuth();
+  const fieldList = fieldsToArray(POSITION_FIELDS);
 
   const onSubmit = async () => {
+    const values = await form.validateFields();
     dispatch(startLoading());
-    try {
-      const values = await form.validateFields();
-      await handleEdit(record._id, values);
-      msg.success("Update successul");
-      setOpen(false);
-      router.refresh();
-    } catch (error: any) {
-      msg.error(error?.message || "Update failed");
-    }
+    axiosAuth
+      .patch(`${POSITION_ENDPOINT}/${record._id}`, values)
+      .then(() => {
+        router.refresh();
+        msg.success("Update successul");
+        setOpen(false);
+      })
+      .catch((error) => {
+        msg.error(error?.response.data.message || "Update failed");
+      });
+
     dispatch(stopLoading());
   };
-
   return (
     <>
       {contextHolder}
@@ -47,30 +54,7 @@ export default function EditPositionButton({ record }: { record: any }) {
         onCancel={() => setOpen(false)}
       >
         <Form form={form} layout="vertical">
-          <Form.Item
-            name="title"
-            label="Title"
-            rules={[{ required: true, message: "Field name is required" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="level"
-            label="Level"
-            rules={[{ required: true, message: "Field level is required" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="salary"
-            label="Salary"
-            rules={[{ required: true, message: "Field salary is required" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item name="description" label="Description">
-            <Input.TextArea />
-          </Form.Item>
+          <AutoFormFields fields={fieldList} />
         </Form>
       </Modal>
     </>

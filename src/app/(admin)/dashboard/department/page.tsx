@@ -1,10 +1,7 @@
 // app/(admin)/dashboard/user/page.tsx
 import React from "react";
 import DepartmentTable from "@/components/admin/department/department.table";
-
-interface IProp {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
+import { IProp } from "@/components/crud/crud-types";
 
 const ManageDepartmentPage = async ({ searchParams }: IProp) => {
   const query = await searchParams;
@@ -23,7 +20,7 @@ const ManageDepartmentPage = async ({ searchParams }: IProp) => {
 
   return (
     <div>
-      <DepartmentTable filters={filters} data={[]} meta={""} />
+      <DepartmentTable filters={filters} />
     </div>
   );
 };

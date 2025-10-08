@@ -1,10 +1,13 @@
 "use client";
-import { Button, Form, Input, InputNumber, Modal, Select, message } from "antd";
+import { Button, Form, Modal, message } from "antd";
 import { useState } from "react";
-import { handleAdd } from "./actions";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/store/loadingSlice";
+import { POSITION_ENDPOINT, POSITION_FIELDS } from "./position.const";
+import { AutoFormFields } from "@/components/crud/AutoFormFields";
+import { useAxiosAuth } from "@/utils/customHook";
+import { fieldsToArray } from "@/utils/fields";
 
 export default function CreatePositionButton() {
   const [open, setOpen] = useState(false);
@@ -12,19 +15,24 @@ export default function CreatePositionButton() {
   const [msg, contextHolder] = message.useMessage();
   const router = useRouter();
   const dispatch = useDispatch();
+  const axiosAuth = useAxiosAuth();
+  const fieldList = fieldsToArray(POSITION_FIELDS);
 
   const onSubmit = async () => {
+    const values = await form.validateFields();
     dispatch(startLoading());
-    try {
-      const values = await form.validateFields();
-      await handleAdd(values);
-      msg.success("Add successful");
-      setOpen(false);
-      form.resetFields();
-      router.refresh();
-    } catch (error: any) {
-      msg.error(error?.message || "Add failed");
-    }
+    console.log(values);
+    await axiosAuth
+      .post(POSITION_ENDPOINT, values)
+      .then(() => {
+        msg.success("Add successful");
+        setOpen(false);
+        form.resetFields();
+        router.refresh();
+      })
+      .catch((error) => {
+        msg.error(error?.response.data.message || "Add failed");
+      });
     dispatch(stopLoading());
   };
 
@@ -42,36 +50,7 @@ export default function CreatePositionButton() {
         onCancel={() => setOpen(false)}
       >
         <Form form={form} layout="vertical">
-          <Form.Item
-            name="title"
-            label="Title"
-            rules={[{ required: true, message: "Field title is required" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="level"
-            label="Level"
-            rules={[{ required: true, message: "Field level is required" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="salary"
-            label="Salary"
-            rules={[{ required: true, message: "Field salary is required" }]}
-          >
-            <InputNumber
-              min={0}
-              style={{ width: "100%" }}
-              formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              }
-            />
-          </Form.Item>
-          <Form.Item name="description" label="Description">
-            <Input.TextArea />
-          </Form.Item>
+          <AutoFormFields fields={fieldList} />
         </Form>
       </Modal>
     </>

@@ -9,3 +9,7 @@ export interface PagingResponse {
   items: any[];
   meta: ResponseMeta;
 }
+
+export interface IProp {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
