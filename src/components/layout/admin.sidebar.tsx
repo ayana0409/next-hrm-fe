@@ -10,18 +10,18 @@ import {
 } from "@ant-design/icons";
 import React, { useContext } from "react";
 import { AdminContext } from "@/library/admin.context";
-import type { MenuProps } from "antd";
+import { Drawer, type MenuProps } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ItemType, MenuItemType } from "antd/es/menu/interface";
 
 type MenuItem = Required<MenuProps>["items"][number];
 const AdminSideBar = () => {
   const { Sider } = Layout;
-  const { collapseMenu } = useContext(AdminContext)!;
+  const { collapseMenu, setCollapseMenu } = useContext(AdminContext)!;
 
   const pathname = usePathname();
-  console.log(pathname);
-  const items: MenuItem[] = [
+  const items: ItemType[] = [
     {
       key: "grp",
       label: "Thuan HRM",
@@ -108,15 +108,52 @@ const AdminSideBar = () => {
   ];
 
   return (
-    <Sider collapsed={collapseMenu}>
-      <Menu
-        mode="inline"
-        defaultSelectedKeys={["dashboard"]}
-        items={items}
-        selectedKeys={[pathname]}
-        style={{ height: "100vh" }}
-      />
-    </Sider>
+    <>
+      <div className=" hidden md:block min-w-[80px] max-w-[200px] flex-shrink-0">
+        <div className=" min-w-[80px] max-w-[200px] flex-shrink-0">
+          <Sider collapsed={collapseMenu}>
+            <Menu
+              mode="inline"
+              defaultSelectedKeys={["dashboard"]}
+              items={items}
+              selectedKeys={[pathname]}
+              style={{ height: "100vh" }}
+            />
+          </Sider>
+        </div>
+      </div>
+
+      {/* Menu ngang cho mobile */}
+      <div className="block md:hidden fixed top-[64px] left-0 right-0 z-50 bg-white">
+        <Drawer
+          placement="left"
+          closable
+          onClose={() => setCollapseMenu(false)}
+          open={collapseMenu}
+          // Thay bodyStyle / maskStyle bằng styles.body / styles.mask
+          styles={{
+            body: { padding: 0 }, // tương đương bodyStyle
+            mask: { backgroundColor: "rgba(0,0,0,0.45)" }, // tương đương maskStyle
+          }}
+        >
+          <Menu
+            mode="inline"
+            selectedKeys={[pathname]}
+            items={items}
+            onClick={() => setCollapseMenu(false)} // tự đóng khi chọn
+          />
+        </Drawer>
+      </div>
+    </>
+    // <Sider collapsed={collapseMenu}>
+    //   <Menu
+    //     mode="inline"
+    //     defaultSelectedKeys={["dashboard"]}
+    //     items={items}
+    //     selectedKeys={[pathname]}
+    //     style={{ height: "100vh" }}
+    //   />
+    // </Sider>
   );
 };
 

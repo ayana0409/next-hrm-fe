@@ -12,7 +12,7 @@ export const USER_FIELDS = makeFields({
     inputType: "input",
     required: true,
     placeholder: "Enter username",
-    width: 400,
+    width: 200,
   },
   PASSWORD: {
     title: "Password",
@@ -42,18 +42,21 @@ export const USER_FIELDS = makeFields({
     inputType: "select",
     placeholder: "Select role",
     options: ["employee", "manager", "admin"],
+    width: 100,
   },
   FULLNAME: {
     title: "Full Name",
     key: "fullname",
     dataIndex: ["employee", "fullName"],
     index: 4,
+    width: 300,
   },
   EMAIL: {
     title: "Email",
     key: "email",
     dataIndex: ["employee", "email"],
     index: 5,
+    responsive: ["lg"],
   },
 
   PHONE: {
@@ -61,5 +64,7 @@ export const USER_FIELDS = makeFields({
     key: "Phone",
     dataIndex: ["employee", "phone"],
     index: 5,
+    responsive: ["lg"],
+    // width: 110,
   },
 } as const);

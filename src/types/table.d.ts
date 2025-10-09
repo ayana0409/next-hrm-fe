@@ -11,6 +11,7 @@ export type FieldDef = {
   required?: boolean;
   placeholder?: string;
   width?: number;
+  responsive?: string[];
 
   hidden?: boolean; // hidden on table
 

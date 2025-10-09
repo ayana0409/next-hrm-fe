@@ -14,7 +14,6 @@ import { DEPARTMENT_ENDPOINT, DEPARTMENT_FIELDS } from "./department.const";
 import { fieldsToColumns, fieldsToArray } from "@/utils/fields";
 
 const columns = fieldsToColumns(fieldsToArray(DEPARTMENT_FIELDS));
-
 export default function DepartmentTable({ filters }: TableProps) {
   const { data: session, status } = useSession({ required: true });
   const axiosAuth = useAxiosAuth();
@@ -22,6 +21,7 @@ export default function DepartmentTable({ filters }: TableProps) {
   const dispatch = useDispatch();
 
   const fetchData = async () => {
+    dispatch(startLoading());
     await axiosAuth
       .get(DEPARTMENT_ENDPOINT, { params: filters })
       .then((res) => {
@@ -36,6 +36,8 @@ export default function DepartmentTable({ filters }: TableProps) {
           },
         });
       });
+
+    dispatch(stopLoading());
   };
 
   useEffect(() => {

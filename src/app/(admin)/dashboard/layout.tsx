@@ -11,11 +11,9 @@ const AdminLayout = ({
 }>) => {
   return (
     <AdminContextProvider>
-      <div style={{ display: "flex" }}>
-        <div className="left-side" style={{ minWidth: 80 }}>
-          <AdminSideBar />
-        </div>
-        <div className="right-side" style={{ flex: 1 }}>
+      <div className="flex w-full overflow-x-hidden">
+        <AdminSideBar />
+        <div className="flex-1 overflow-hidden">
           <AdminHeader />
           <AdminContent>{children}</AdminContent>
           <AdminFooter />

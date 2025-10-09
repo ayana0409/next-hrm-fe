@@ -12,7 +12,7 @@ export const DEPARTMENT_FIELDS = makeFields({
     inputType: "input",
     required: true,
     placeholder: "Enter department name",
-    width: 400,
+    width: 300,
   },
   DESCRIPTION: {
     title: "Description",

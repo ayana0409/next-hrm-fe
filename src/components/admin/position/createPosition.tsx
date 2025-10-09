@@ -21,7 +21,6 @@ export default function CreatePositionButton() {
   const onSubmit = async () => {
     const values = await form.validateFields();
     dispatch(startLoading());
-    console.log(values);
     await axiosAuth
       .post(POSITION_ENDPOINT, values)
       .then(() => {

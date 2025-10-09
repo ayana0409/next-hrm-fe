@@ -1,9 +1,10 @@
 "use client";
-import { Button, Modal, message } from "antd";
+import { Button, Modal, Tooltip, message } from "antd";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAxiosAuth } from "@/utils/customHook";
 import { DEPARTMENT_ENDPOINT } from "./department.const";
+import { DeleteFilled } from "@ant-design/icons";
 
 export default function DeleteDepartmentButton({ id }: { id: string }) {
   const [open, setOpen] = useState(false);
@@ -27,9 +28,17 @@ export default function DeleteDepartmentButton({ id }: { id: string }) {
   return (
     <>
       {contextHolder}
-      <Button danger type="link" onClick={() => setOpen(true)}>
-        Delete
-      </Button>
+      <Tooltip title="Delete">
+        <Button
+          onClick={() => setOpen(true)}
+          aria-label="Delete"
+          className="bg-red-600 text-white hover:bg-red-700 rounded px-3 py-1 transition shadow-sm"
+          style={{ border: "none" }}
+        >
+          <DeleteFilled className="mr-2" />
+          Delete
+        </Button>
+      </Tooltip>
       <Modal
         title="Delete confirm"
         open={open}

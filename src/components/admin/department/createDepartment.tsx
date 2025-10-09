@@ -38,7 +38,7 @@ export default function CreateDepartmentButton() {
   return (
     <>
       {contextHolder}
-      <Button type="primary" onClick={() => setOpen(true)}>
+      <Button className="" type="primary" onClick={() => setOpen(true)}>
         + Add Department
       </Button>
 

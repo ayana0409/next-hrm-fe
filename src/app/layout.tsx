@@ -8,6 +8,7 @@ import "@/app/globals.css";
 import ReduxProvider from "@/provider/ReduxProvider";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { SessionProvider } from "next-auth/react";
+import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi">
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+
       <body className={inter.className}>
         <SessionProvider>
           <ReduxProvider>
