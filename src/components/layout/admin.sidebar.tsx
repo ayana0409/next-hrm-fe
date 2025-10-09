@@ -10,7 +10,7 @@ import {
 } from "@ant-design/icons";
 import React, { useContext } from "react";
 import { AdminContext } from "@/library/admin.context";
-import { Drawer, type MenuProps } from "antd";
+import { Drawer, Grid, type MenuProps } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ItemType, MenuItemType } from "antd/es/menu/interface";
@@ -19,6 +19,8 @@ type MenuItem = Required<MenuProps>["items"][number];
 const AdminSideBar = () => {
   const { Sider } = Layout;
   const { collapseMenu, setCollapseMenu } = useContext(AdminContext)!;
+  const { useBreakpoint } = Grid;
+  const screens = useBreakpoint();
 
   const pathname = usePathname();
   const items: ItemType[] = [
@@ -109,7 +111,7 @@ const AdminSideBar = () => {
 
   return (
     <>
-      <div className=" hidden md:block min-w-[80px] max-w-[200px] flex-shrink-0">
+      <div className="hidden md:block min-w-[80px] max-w-[200px] flex-shrink-0">
         <div className=" min-w-[80px] max-w-[200px] flex-shrink-0">
           <Sider collapsed={collapseMenu}>
             <Menu
@@ -124,26 +126,27 @@ const AdminSideBar = () => {
       </div>
 
       {/* Menu ngang cho mobile */}
-      <div className="block md:hidden fixed top-[64px] left-0 right-0 z-50 bg-white">
-        <Drawer
-          placement="left"
-          closable
-          onClose={() => setCollapseMenu(false)}
-          open={collapseMenu}
-          // Thay bodyStyle / maskStyle bằng styles.body / styles.mask
-          styles={{
-            body: { padding: 0 }, // tương đương bodyStyle
-            mask: { backgroundColor: "rgba(0,0,0,0.45)" }, // tương đương maskStyle
-          }}
-        >
-          <Menu
-            mode="inline"
-            selectedKeys={[pathname]}
-            items={items}
-            onClick={() => setCollapseMenu(false)} // tự đóng khi chọn
-          />
-        </Drawer>
-      </div>
+      {!screens.md && (
+        <div className="block md:hidden fixed top-[64px] left-0 right-0 z-50 bg-white">
+          <Drawer
+            placement="left"
+            closable
+            onClose={() => setCollapseMenu(false)}
+            open={collapseMenu}
+            styles={{
+              body: { padding: 0 },
+              mask: { backgroundColor: "rgba(0,0,0,0.45)" },
+            }}
+          >
+            <Menu
+              mode="inline"
+              selectedKeys={[pathname]}
+              items={items}
+              onClick={() => setCollapseMenu(false)}
+            />
+          </Drawer>
+        </div>
+      )}
     </>
     // <Sider collapsed={collapseMenu}>
     //   <Menu

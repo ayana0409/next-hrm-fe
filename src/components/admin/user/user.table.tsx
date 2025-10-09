@@ -12,6 +12,7 @@ import { fieldsToColumns, fieldsToArray } from "@/utils/fields";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { Space } from "antd";
 
 const columns = fieldsToColumns(fieldsToArray(USER_FIELDS, true));
 
@@ -51,10 +52,10 @@ export default function UserTable({ filters }: TableProps) {
         items={data?.items}
         meta={data?.meta}
         actions={(record) => (
-          <>
+          <Space>
             <EditUserButton record={record} />
             <DeleteUserButton id={record._id} />
-          </>
+          </Space>
         )}
       />
     </div>

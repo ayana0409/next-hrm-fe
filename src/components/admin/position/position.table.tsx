@@ -12,6 +12,7 @@ import { fieldsToColumns, fieldsToArray } from "@/utils/fields";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { Space } from "antd";
 
 const columns = fieldsToColumns(fieldsToArray(POSITION_FIELDS));
 
@@ -52,10 +53,10 @@ export default function PositionTable({ filters }: TableProps) {
         items={data?.items}
         meta={data?.meta}
         actions={(record) => (
-          <>
+          <Space>
             <EditPositionButton record={record} />
             <DeletePositionButton id={record._id} />
-          </>
+          </Space>
         )}
       />
     </div>

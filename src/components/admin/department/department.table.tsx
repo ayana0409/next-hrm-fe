@@ -12,6 +12,7 @@ import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/store/loadingSlice";
 import { DEPARTMENT_ENDPOINT, DEPARTMENT_FIELDS } from "./department.const";
 import { fieldsToColumns, fieldsToArray } from "@/utils/fields";
+import { Space } from "antd";
 
 const columns = fieldsToColumns(fieldsToArray(DEPARTMENT_FIELDS));
 export default function DepartmentTable({ filters }: TableProps) {
@@ -56,10 +57,10 @@ export default function DepartmentTable({ filters }: TableProps) {
         items={data?.items}
         meta={data?.meta}
         actions={(record) => (
-          <>
+          <Space>
             <EditDepartmentButton record={record} />
             <DeleteDepartmentButton id={record._id} />
-          </>
+          </Space>
         )}
       />
     </div>

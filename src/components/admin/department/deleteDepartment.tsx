@@ -29,15 +29,13 @@ export default function DeleteDepartmentButton({ id }: { id: string }) {
     <>
       {contextHolder}
       <Tooltip title="Delete">
-        <Button
+        <button
           onClick={() => setOpen(true)}
           aria-label="Delete"
-          className="bg-red-600 text-white hover:bg-red-700 rounded px-3 py-1 transition shadow-sm"
-          style={{ border: "none" }}
+          className="bg-red-600 text-white hover:bg-red-800 rounded px-3 py-1 transition shadow-sm"
         >
           <DeleteFilled className="mr-2" />
-          Delete
-        </Button>
+        </button>
       </Tooltip>
       <Modal
         title="Delete confirm"

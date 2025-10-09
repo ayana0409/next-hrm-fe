@@ -1,5 +1,5 @@
 "use client";
-import { Button, Form, Modal, message } from "antd";
+import { Button, Form, Modal, Tooltip, message } from "antd";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { startLoading, stopLoading } from "@/store/loadingSlice";
@@ -8,6 +8,7 @@ import { useAxiosAuth } from "@/utils/customHook";
 import { AutoFormFields } from "@/components/crud/AutoFormFields";
 import { fieldsToArray } from "@/utils/fields";
 import { DEPARTMENT_ENDPOINT, DEPARTMENT_FIELDS } from "./department.const";
+import { EditFilled } from "@ant-design/icons";
 
 export default function EditDepartmentButton({ record }: { record: any }) {
   const [open, setOpen] = useState(false);
@@ -38,16 +39,19 @@ export default function EditDepartmentButton({ record }: { record: any }) {
   return (
     <>
       {contextHolder}
-      <Button
-        type="link"
-        onClick={() => {
-          form.setFieldsValue(record);
-          setOpen(true);
-          router.refresh();
-        }}
-      >
-        Edit
-      </Button>
+      <Tooltip title="Edit" className="m-2">
+        <button
+          onClick={() => {
+            form.setFieldsValue(record);
+            setOpen(true);
+            router.refresh();
+          }}
+          aria-label="Edit"
+          className="bg-blue-400 text-white hover:bg-blue-800 rounded px-3 py-1 transition shadow-sm"
+        >
+          <EditFilled className="mr-2" />
+        </button>
+      </Tooltip>
       <Modal
         title="Update Department"
         open={open}
