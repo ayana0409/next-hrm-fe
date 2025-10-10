@@ -1,30 +1,45 @@
 "use client";
-import { Button, Form, Input, Modal, Select, Tooltip, message } from "antd";
-import { useState } from "react";
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Space,
+  Tooltip,
+  message,
+} from "antd";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { startLoading, stopLoading } from "@/store/loadingSlice";
 import { useDispatch } from "react-redux";
 import { USER_ENDPOINT } from "./user.const";
 import { useAxiosAuth } from "@/utils/customHook";
 import { EditFilled } from "@ant-design/icons";
+import EmployeeSelectModal from "../employee/selectEmployee.model";
 
 export default function EditUserButton({ record }: { record: any }) {
   const [open, setOpen] = useState(false);
+  const [openEmpModal, setOpenEmpModal] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<{
+    id: string;
+    fullName: string;
+  }>(record.employee);
   const [form] = Form.useForm();
   const [msg, contextHolder] = message.useMessage();
   const router = useRouter();
   const dispatch = useDispatch();
   const axiosAuth = useAxiosAuth();
-
   const onSubmit = async () => {
     const values = await form.validateFields();
     dispatch(startLoading());
     axiosAuth
       .patch(`${USER_ENDPOINT}/${record._id}`, values)
       .then(() => {
-        router.refresh();
         msg.success("Update successul");
         setOpen(false);
+        form.resetFields();
+        router.refresh();
       })
       .catch((error) => {
         msg.error(error?.response.data.message || "Update failed");
@@ -33,6 +48,17 @@ export default function EditUserButton({ record }: { record: any }) {
     dispatch(stopLoading());
   };
 
+  const handleSelect = (employee: { id: string; fullName: string }) => {
+    setSelectedEmployee(employee);
+    setOpenEmpModal(false);
+  };
+  useEffect(() => {
+    if (selectedEmployee?.id) {
+      form.setFieldsValue({
+        employeeId: selectedEmployee.id,
+      });
+    }
+  }, [selectedEmployee]);
   return (
     <>
       {contextHolder}
@@ -59,6 +85,17 @@ export default function EditUserButton({ record }: { record: any }) {
           <Form.Item name="username" label="Username">
             <Input />
           </Form.Item>
+          <Form.Item label="Employee">
+            <Space.Compact style={{ width: "100%" }}>
+              <Input disabled value={selectedEmployee?.fullName || ""} />
+              <Button type="primary" onClick={() => setOpenEmpModal(true)}>
+                Chose
+              </Button>
+            </Space.Compact>
+          </Form.Item>
+          <Form.Item name="employeeId" hidden={true}>
+            <Input disabled />
+          </Form.Item>
           <Form.Item name="role" label="Role">
             <Select
               options={[
@@ -70,6 +107,11 @@ export default function EditUserButton({ record }: { record: any }) {
           </Form.Item>
         </Form>
       </Modal>
+      <EmployeeSelectModal
+        visible={openEmpModal}
+        onCancel={() => setOpenEmpModal(false)}
+        onSelect={handleSelect}
+      />
     </>
   );
 }

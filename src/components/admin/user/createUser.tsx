@@ -1,14 +1,20 @@
 "use client";
-import { Button, Form, Input, Modal, Select, message } from "antd";
-import { useState } from "react";
+import { Button, Form, Input, Modal, Select, Space, message } from "antd";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/store/loadingSlice";
-import { USER_ENDPOINT, USER_FIELDS } from "./user.const";
+import { USER_ENDPOINT } from "./user.const";
 import { useAxiosAuth } from "@/utils/customHook";
+import EmployeeSelectModal from "../employee/selectEmployee.model";
 
 export default function CreateUserButton() {
   const [open, setOpen] = useState(false);
+  const [openEmpModal, setOpenEmpModal] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<{
+    id: string;
+    fullName: string;
+  }>({ id: "", fullName: "" });
   const [form] = Form.useForm();
   const [msg, contextHolder] = message.useMessage();
   const router = useRouter();
@@ -37,6 +43,17 @@ export default function CreateUserButton() {
       });
     dispatch(stopLoading());
   };
+  const handleSelect = (employee: { id: string; fullName: string }) => {
+    setSelectedEmployee(employee);
+    setOpenEmpModal(false);
+  };
+  useEffect(() => {
+    if (selectedEmployee?.id) {
+      form.setFieldsValue({
+        employeeId: selectedEmployee.id,
+      });
+    }
+  }, [selectedEmployee]);
 
   return (
     <>
@@ -75,6 +92,17 @@ export default function CreateUserButton() {
           >
             <Input.Password />
           </Form.Item>
+          <Form.Item label="Employee">
+            <Space.Compact style={{ width: "100%" }}>
+              <Input disabled value={selectedEmployee?.fullName || ""} />
+              <Button type="primary" onClick={() => setOpenEmpModal(true)}>
+                Chose
+              </Button>
+            </Space.Compact>
+          </Form.Item>
+          <Form.Item name="employeeId" hidden={true}>
+            <Input disabled />
+          </Form.Item>
           <Form.Item name="role" label="Role">
             <Select
               options={[
@@ -86,6 +114,11 @@ export default function CreateUserButton() {
           </Form.Item>
         </Form>
       </Modal>
+      <EmployeeSelectModal
+        visible={openEmpModal}
+        onCancel={() => setOpenEmpModal(false)}
+        onSelect={handleSelect}
+      />
     </>
   );
 }
