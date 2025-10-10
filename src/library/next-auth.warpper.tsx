@@ -1,7 +1,7 @@
 "use client";
 
 import api from "@/utils/api";
-import { signOut, useSession } from "next-auth/react";
+import { getSession, signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 export default function NextAuthWarpper({
@@ -17,6 +17,14 @@ export default function NextAuthWarpper({
       customSignOut();
     }
   }, [session, session?.error]);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      await getSession();
+    }, 100 * 1000); // 30s
+
+    return () => clearInterval(interval);
+  }, []);
 
   return <>{children}</>;
 }
