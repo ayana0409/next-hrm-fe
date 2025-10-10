@@ -36,7 +36,7 @@ export function usePaginationQuery(defaultPageSize: number = 10) {
   };
 }
 
-export const useAxiosAuth = () => {
+export const useAxiosAuth = (setIsRefreshing?: (value: boolean) => void) => {
   const { data: session, status } = useSession({ required: true });
   const refreshToken = useRefreshToken();
 
@@ -60,14 +60,21 @@ export const useAxiosAuth = () => {
           !prevRequest?.sent &&
           session?.refresh_token
         ) {
+          setIsRefreshing?.(true);
           prevRequest.sent = true;
           try {
             const { accessToken } = await refreshToken();
+            if (!accessToken) {
+              // Không có token => không gọi lại request, không trả về gì
+              return;
+            }
             prevRequest.headers["Authorization"] = `Bearer ${accessToken}`;
             return axiosAuth(prevRequest);
           } catch (refreshError) {
             if (session) session.error = "RefreshAccessTokenError";
             return Promise.reject(refreshError);
+          } finally {
+            setIsRefreshing?.(false);
           }
         }
         return Promise.reject(error);
@@ -83,7 +90,7 @@ export const useAxiosAuth = () => {
 };
 
 export const useRefreshToken = () => {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const refreshToken = async () => {
     try {
       const res = await api.post("/auth/refresh", {
@@ -91,10 +98,9 @@ export const useRefreshToken = () => {
       });
 
       const { accessToken, refreshToken } = res.data;
-
-      if (session) {
-        session.access_token = accessToken;
-        session.refresh_token = refreshToken;
+      console.log(res.data);
+      if (accessToken && refreshToken !== session?.refresh_token) {
+        update({ access_token: accessToken, refresh_token: refreshToken });
       }
 
       return { accessToken, refreshToken };
