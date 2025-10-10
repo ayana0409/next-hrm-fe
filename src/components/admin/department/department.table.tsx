@@ -6,7 +6,7 @@ import EditDepartmentButton from "./editDepartment";
 import CreateDepartmentButton from "./createDepartment";
 import { TableProps } from "@/types/table";
 import { useAxiosAuth } from "@/utils/customHook";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/store/loadingSlice";
@@ -19,18 +19,20 @@ const columns = fieldsToColumns(fieldsToArray(DEPARTMENT_FIELDS));
 export default function DepartmentTable({
   filters: initialFilters,
 }: TableProps) {
-  const { data: session, status } = useSession({ required: true });
-  const axiosAuth = useAxiosAuth();
+  const { status } = useSession({ required: true });
   const [data, setData] = useState<PagingResponse>();
   const dispatch = useDispatch();
   const [filters, setFilters] = useState<any>(initialFilters || {});
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState<string | undefined>();
+  const axiosAuth = useAxiosAuth();
+  const isMounted = useRef(false);
 
   const fetchData = async () => {
     dispatch(startLoading());
     await axiosAuth
       .get(DEPARTMENT_ENDPOINT, { params: filters })
       .then((res) => {
+        if (!res) return;
         const { items, current, pageSize, pages, totalItem } = res.data.data;
         setData({
           items,
@@ -41,42 +43,53 @@ export default function DepartmentTable({
             totalItem,
           },
         });
+        dispatch(stopLoading());
       });
-
-    dispatch(stopLoading());
   };
-
   useEffect(() => {
-    dispatch(startLoading());
-    if (status === "authenticated" && session?.access_token) {
-      fetchData();
-      dispatch(stopLoading());
+    if (status === "authenticated") {
+      if (!isMounted.current) {
+        fetchData();
+        isMounted.current = true;
+      } else {
+        fetchData();
+      }
     }
-  }, [status, session, filters]);
+  }, [status, filters]);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (searchValue.trim()) {
-        setFilters({
-          ...filters,
-          filter: JSON.stringify({
+    if (status === "authenticated") {
+      const timeout = setTimeout(() => {
+        let newFilters = filters;
+
+        if (searchValue) {
+          const filterObj = JSON.stringify({
             $or: [
               { name: { $regex: searchValue, $options: "i" } },
               { description: { $regex: searchValue, $options: "i" } },
             ],
-          }),
-        });
-      } else {
-        setFilters((prev: any) => {
-          let newFilters = { ...prev };
-          if (newFilters.filter) delete newFilters.filter;
-          return newFilters;
-        });
-      }
-    }, 500);
+          });
+          if (newFilters.filter !== filterObj) {
+            newFilters = { ...newFilters, filter: filterObj };
+          }
+        } else if (newFilters.filter) {
+          newFilters = { ...newFilters };
+          delete newFilters.filter;
+        }
 
-    return () => clearTimeout(timeout);
+        if (newFilters !== filters) {
+          setFilters(newFilters);
+        }
+      }, 500);
+      return () => clearTimeout(timeout);
+    }
   }, [searchValue]);
+
+  useEffect(() => {
+    if (JSON.stringify(initialFilters) !== JSON.stringify(filters)) {
+      setFilters({ ...initialFilters, filter: filters.filter });
+    }
+  }, [initialFilters]);
 
   return (
     <div>
@@ -93,7 +106,7 @@ export default function DepartmentTable({
             />
             <button
               className="bg-gray-400 text-shadow-neutral-950 hover:bg-gray-600 rounded px-3 py-1 transition shadow-sm"
-              onClick={() => setSearchValue("")}
+              onClick={() => setSearchValue(undefined)}
             >
               <SyncOutlined />
             </button>

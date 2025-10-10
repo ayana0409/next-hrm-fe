@@ -10,7 +10,7 @@ import { startLoading, stopLoading } from "@/store/loadingSlice";
 import { useAxiosAuth } from "@/utils/customHook";
 import { fieldsToColumns, fieldsToArray } from "@/utils/fields";
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { Input, Space } from "antd";
 import { SyncOutlined } from "@ant-design/icons";
@@ -18,15 +18,18 @@ import { SyncOutlined } from "@ant-design/icons";
 const columns = fieldsToColumns(fieldsToArray(POSITION_FIELDS));
 
 export default function PositionTable({ filters: initialFilters }: TableProps) {
-  const { data: session, status } = useSession({ required: true });
+  const { status } = useSession({ required: true });
   const axiosAuth = useAxiosAuth();
   const [data, setData] = useState<PagingResponse>();
   const dispatch = useDispatch();
   const [filters, setFilters] = useState<any>(initialFilters || {});
   const [searchValue, setSearchValue] = useState("");
+  const isMounted = useRef(false);
 
   const fetchData = async () => {
+    dispatch(startLoading());
     await axiosAuth.get(POSITION_ENDPOINT, { params: filters }).then((res) => {
+      if (!res) return;
       const { items, current, pageSize, pages, totalItem } = res.data.data;
       setData({
         items,
@@ -37,41 +40,54 @@ export default function PositionTable({ filters: initialFilters }: TableProps) {
           totalItem,
         },
       });
+      dispatch(stopLoading());
     });
   };
+  useEffect(() => {
+    if (status === "authenticated") {
+      if (!isMounted.current) {
+        fetchData();
+        isMounted.current = true;
+      } else {
+        fetchData();
+      }
+    }
+  }, [status, filters]);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (searchValue.trim()) {
-        setFilters({
-          ...filters,
-          filter: JSON.stringify({
+    if (status === "authenticated") {
+      const timeout = setTimeout(() => {
+        let newFilters = filters;
+
+        if (searchValue) {
+          const filterObj = JSON.stringify({
             $or: [
               { title: { $regex: searchValue, $options: "i" } },
               { level: { $regex: searchValue, $options: "i" } },
               { description: { $regex: searchValue, $options: "i" } },
             ],
-          }),
-        });
-      } else {
-        setFilters((prev: any) => {
-          let newFilters = { ...prev };
-          if (newFilters.filter) delete newFilters.filter;
-          return newFilters;
-        });
-      }
-    }, 500);
+          });
+          if (newFilters.filter !== filterObj) {
+            newFilters = { ...newFilters, filter: filterObj };
+          }
+        } else if (newFilters.filter) {
+          newFilters = { ...newFilters };
+          delete newFilters.filter;
+        }
 
-    return () => clearTimeout(timeout);
+        if (newFilters !== filters) {
+          setFilters(newFilters);
+        }
+      }, 500);
+      return () => clearTimeout(timeout);
+    }
   }, [searchValue]);
 
   useEffect(() => {
-    dispatch(startLoading());
-    if (status === "authenticated" && session?.access_token) {
-      fetchData();
-      dispatch(stopLoading());
+    if (JSON.stringify(initialFilters) !== JSON.stringify(filters)) {
+      setFilters({ ...initialFilters, filter: filters.filter });
     }
-  }, [status, session, filters]);
+  }, [initialFilters]);
 
   return (
     <div>

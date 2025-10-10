@@ -10,7 +10,7 @@ import { startLoading, stopLoading } from "@/store/loadingSlice";
 import { useAxiosAuth } from "@/utils/customHook";
 import { fieldsToColumns, fieldsToArray } from "@/utils/fields";
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { Input, Space } from "antd";
 import { SyncOutlined } from "@ant-design/icons";
@@ -25,50 +25,69 @@ export default function UserTable({ filters: initialFilters }: TableProps) {
   const [data, setData] = useState<PagingResponse>();
   const [filters, setFilters] = useState<any>(initialFilters || {});
   const [searchValue, setSearchValue] = useState("");
+  const isMounted = useRef(false);
 
   const fetchData = async () => {
-    try {
-      const res = await axiosAuth.get(USER_ENDPOINT, { params: filters });
+    dispatch(startLoading());
+    await axiosAuth.get(USER_ENDPOINT, { params: filters }).then((res) => {
+      if (!res) return;
       const { items, current, pageSize, pages, totalItem } = res.data.data;
       setData({
         items,
-        meta: { current, pageSize, pages, totalItem },
+        meta: {
+          current,
+          pageSize,
+          pages,
+          totalItem,
+        },
       });
-    } catch (error) {
-      console.error("Fetch users failed:", error);
-    }
+      dispatch(stopLoading());
+    });
   };
-
   useEffect(() => {
-    dispatch(startLoading());
-    if (status === "authenticated" && session?.access_token) {
-      fetchData().finally(() => dispatch(stopLoading()));
+    if (status === "authenticated") {
+      if (!isMounted.current) {
+        fetchData();
+        isMounted.current = true;
+      } else {
+        fetchData();
+      }
     }
-  }, [status, session, filters]);
+  }, [status, filters]);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (searchValue.trim()) {
-        setFilters({
-          ...filters,
-          filter: JSON.stringify({
+    if (status === "authenticated") {
+      const timeout = setTimeout(() => {
+        let newFilters = filters;
+
+        if (searchValue) {
+          const filterObj = JSON.stringify({
             $or: [
               { username: { $regex: searchValue, $options: "i" } },
               { role: { $regex: searchValue, $options: "i" } },
             ],
-          }),
-        });
-      } else {
-        setFilters((prev: any) => {
-          let newFilters = { ...prev };
-          if (newFilters.filter) delete newFilters.filter;
-          return newFilters;
-        });
-      }
-    }, 500);
+          });
+          if (newFilters.filter !== filterObj) {
+            newFilters = { ...newFilters, filter: filterObj };
+          }
+        } else if (newFilters.filter) {
+          newFilters = { ...newFilters };
+          delete newFilters.filter;
+        }
 
-    return () => clearTimeout(timeout);
+        if (newFilters !== filters) {
+          setFilters(newFilters);
+        }
+      }, 500);
+      return () => clearTimeout(timeout);
+    }
   }, [searchValue]);
+
+  useEffect(() => {
+    if (JSON.stringify(initialFilters) !== JSON.stringify(filters)) {
+      setFilters({ ...initialFilters, filter: filters.filter });
+    }
+  }, [initialFilters]);
 
   return (
     <div>
