@@ -18,7 +18,8 @@ export function makeFields<T extends Record<string, FieldDef>>(obj: T): T {
 
 export function fieldsToArray<T extends Record<string, FieldDef>>(
   fields: T,
-  hidden?: boolean
+  hidden?: boolean,
+  notInput?: boolean
 ) {
   return Object.values(fields)
     .slice()
@@ -26,6 +27,9 @@ export function fieldsToArray<T extends Record<string, FieldDef>>(
       // nếu hidden === true thì loại bỏ các field có f.hidden === true
       if (hidden)
         return !Boolean((f as FieldDef & { hidden?: boolean }).hidden);
+
+      if (notInput)
+        return !Boolean((f as FieldDef & { notInput?: boolean }).notInput);
       // nếu hidden không truyền hoặc false thì giữ tất cả
       return true;
     })

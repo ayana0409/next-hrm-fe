@@ -14,6 +14,7 @@ export type FieldDef = {
   responsive?: string[];
 
   hidden?: boolean; // hidden on table
+  notInput?: boolean; // hidden on form
 
   inputType?:
     | "input"
