@@ -45,6 +45,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.refresh_token = (user as any).refresh_token;
         return token;
       }
+      if (trigger === "update" && session) {
+        // Cập nhật tokens mới từ client update
+        token.access_token = session.access_token as string;
+        token.refresh_token = session.refresh_token as string;
+        console.log("JWT updated with new tokens");
+        return token;
+      }
       return { ...token, ...user };
     },
     async session({ session, token }) {
@@ -53,6 +60,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.refresh_token = token.refresh_token as string;
       session.user = token.user as any;
       session.error = token.error as string | undefined;
+
       return session;
     },
     authorized: async ({ auth }) => {
