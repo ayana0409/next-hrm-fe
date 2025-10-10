@@ -1,15 +1,16 @@
 "use client";
-import { Button, Form, Modal, message } from "antd";
+import { Button, Form, Modal, Tooltip, message } from "antd";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useDispatch } from "react-redux";
-import { startLoading, stopLoading } from "@/store/loadingSlice";
 import { POSITION_ENDPOINT, POSITION_FIELDS } from "./position.const";
 import { AutoFormFields } from "@/components/crud/AutoFormFields";
 import { useAxiosAuth } from "@/utils/customHook";
 import { fieldsToArray } from "@/utils/fields";
+import { EditFilled } from "@ant-design/icons";
 
-export default function CreatePositionButton() {
+export default function EditPositionButton({ record }: { record: any }) {
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
   const [msg, contextHolder] = message.useMessage();
@@ -21,29 +22,38 @@ export default function CreatePositionButton() {
   const onSubmit = async () => {
     const values = await form.validateFields();
     dispatch(startLoading());
-    await axiosAuth
-      .post(POSITION_ENDPOINT, values)
+    axiosAuth
+      .patch(`${POSITION_ENDPOINT}/${record._id}`, values)
       .then(() => {
-        msg.success("Add successful");
-        setOpen(false);
-        form.resetFields();
         router.refresh();
+        msg.success("Update successul");
+        setOpen(false);
       })
       .catch((error) => {
-        msg.error(error?.response.data.message || "Add failed");
+        msg.error(error?.response.data.message || "Update failed");
       });
+
     dispatch(stopLoading());
   };
-
   return (
     <>
       {contextHolder}
-      <Button type="primary" onClick={() => setOpen(true)}>
-        + Add Position
-      </Button>
+      <Tooltip title="Edit" className="m-2">
+        <button
+          onClick={() => {
+            form.setFieldsValue(record);
+            setOpen(true);
+            router.refresh();
+          }}
+          aria-label="Edit"
+          className="bg-blue-400 text-white hover:bg-blue-800 rounded px-3 py-1 transition shadow-sm"
+        >
+          <EditFilled className="mr-2" />
+        </button>
+      </Tooltip>
 
       <Modal
-        title="Add Position"
+        title="Update Position"
         open={open}
         onOk={onSubmit}
         onCancel={() => setOpen(false)}

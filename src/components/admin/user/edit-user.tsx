@@ -11,12 +11,12 @@ import {
 } from "antd";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { startLoading, stopLoading } from "@/store/loadingSlice";
+import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useDispatch } from "react-redux";
 import { USER_ENDPOINT } from "./user.const";
 import { useAxiosAuth } from "@/utils/customHook";
 import { EditFilled } from "@ant-design/icons";
-import EmployeeSelectModal from "../employee/selectEmployee.model";
+import EmployeeSelectModal from "../employee/select-employee.modal";
 
 export default function EditUserButton({ record }: { record: any }) {
   const [open, setOpen] = useState(false);

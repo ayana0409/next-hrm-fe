@@ -2,11 +2,11 @@
 import { TableProps } from "@/types/table";
 import CrudTable from "../../crud/CrudTable";
 import { PagingResponse } from "../../crud/crud-types";
-import CreatePositionButton from "./createPosition";
-import DeletePositionButton from "./deletePosition";
-import EditPositionButton from "./editPosition";
+import CreatePositionButton from "./create-position";
+import DeletePositionButton from "./delete-position";
+import EditPositionButton from "./edit-position";
 import { POSITION_ENDPOINT, POSITION_FIELDS } from "./position.const";
-import { startLoading, stopLoading } from "@/store/loadingSlice";
+import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useAxiosAuth } from "@/utils/customHook";
 import { fieldsToColumns, fieldsToArray } from "@/utils/fields";
 import { useSession } from "next-auth/react";

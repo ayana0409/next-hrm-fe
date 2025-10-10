@@ -6,7 +6,7 @@ import { App } from "antd";
 import NextAuthWarpper from "@/library/next-auth.warpper";
 import "@/app/globals.css";
 import ReduxProvider from "@/provider/ReduxProvider";
-import LoadingOverlay from "@/components/LoadingOverlay";
+import LoadingOverlay from "@/components/loading-overlay";
 import { SessionProvider } from "next-auth/react";
 import Head from "next/head";
 

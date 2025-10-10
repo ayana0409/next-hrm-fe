@@ -9,7 +9,7 @@ import { useAxiosAuth } from "@/utils/customHook";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useDispatch } from "react-redux";
-import { startLoading, stopLoading } from "@/store/loadingSlice";
+import { startLoading, stopLoading } from "@/store/loading-slice";
 import { fieldsToColumns, fieldsToArray } from "@/utils/fields";
 import { Input, Space } from "antd";
 import { SyncOutlined } from "@ant-design/icons";

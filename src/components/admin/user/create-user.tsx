@@ -3,10 +3,10 @@ import { Button, Form, Input, Modal, Select, Space, message } from "antd";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { startLoading, stopLoading } from "@/store/loadingSlice";
+import { startLoading, stopLoading } from "@/store/loading-slice";
 import { USER_ENDPOINT } from "./user.const";
 import { useAxiosAuth } from "@/utils/customHook";
-import EmployeeSelectModal from "../employee/selectEmployee.model";
+import EmployeeSelectModal from "../employee/select-employee.modal";
 
 export default function CreateUserButton() {
   const [open, setOpen] = useState(false);

@@ -1,12 +1,12 @@
 "use client";
 import CrudTable from "../../crud/CrudTable";
-import CreateUserButton from "./createUser";
-import EditUserButton from "./editUser";
-import DeleteUserButton from "./deleteUser";
+import CreateUserButton from "./create-user";
+import EditUserButton from "./edit-user";
+import DeleteUserButton from "./delete-user";
 import { PagingResponse } from "../../crud/crud-types";
 import { TableProps } from "@/types/table";
 import { USER_ENDPOINT, USER_FIELDS } from "./user.const";
-import { startLoading, stopLoading } from "@/store/loadingSlice";
+import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useAxiosAuth } from "@/utils/customHook";
 import { fieldsToColumns, fieldsToArray } from "@/utils/fields";
 import { useSession } from "next-auth/react";

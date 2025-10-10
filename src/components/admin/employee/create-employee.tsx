@@ -3,7 +3,7 @@ import { Button, Form, Input, Modal, Space, message } from "antd";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { startLoading, stopLoading } from "@/store/loadingSlice";
+import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useAxiosAuth } from "@/utils/customHook";
 import { fieldsToArray } from "@/utils/fields";
 import { AutoFormFields } from "@/components/crud/AutoFormFields";
