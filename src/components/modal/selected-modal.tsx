@@ -5,11 +5,16 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Modal, Input, Button, Table, Pagination, Spin, Space } from "antd";
 import { SyncOutlined } from "@ant-design/icons";
 import { ColumnType } from "antd/es/table";
-import { stopLoading, startLoading } from "@/store/loadingSlice";
 import { useAxiosAuth } from "@/utils/customHook";
 import { PagingResponse } from "../crud/crud-types";
 
-interface SelectModalProps<T> {
+export interface SelectModalProps<T> {
+  visible: boolean;
+  onCancel: () => void;
+  onSelect: (selected: T) => void;
+}
+
+interface BaseSelectModalProps<T> {
   visible: boolean;
   onCancel: () => void;
   onSelect: (selected: T) => void;
@@ -27,8 +32,8 @@ const SelectModal = <T extends { id: string }>({
   searchFields,
   columns,
   title,
-}: SelectModalProps<T>) => {
-  const { data: session, status } = useSession({ required: true });
+}: BaseSelectModalProps<T>) => {
+  const { status } = useSession({ required: true });
   const axiosAuth = useAxiosAuth();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -42,9 +47,9 @@ const SelectModal = <T extends { id: string }>({
 
   // Fetch data
   const fetchData = async () => {
-    setLoading(true);
     try {
       const res = await axiosAuth.get(apiRoute, { params: filters });
+      if (!res) return;
       const { items, current, pageSize, pages, totalItem } = res.data.data;
       setData({
         items,
@@ -52,9 +57,6 @@ const SelectModal = <T extends { id: string }>({
       });
     } catch (error) {
       console.error(`Fetch data from ${apiRoute} failed:`, error);
-    } finally {
-      setLoading(false);
-      dispatch(stopLoading());
     }
   };
 

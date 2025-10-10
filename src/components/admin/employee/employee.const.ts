@@ -1,1 +1,73 @@
+import { makeFields } from "@/utils/fields";
+
 export const EMPLOYEE_ROUTE = "employee";
+
+export const EMPLOYEE_FIELDS = makeFields({
+  FULL_NAME: {
+    title: "Full Name",
+    key: "fullName",
+    dataIndex: "fullName",
+    index: 0,
+    fixed: true,
+    inputType: "input",
+    required: true,
+    placeholder: "Enter employee name",
+    width: 300,
+  },
+  EMAIL: {
+    title: "Email",
+    key: "email",
+    dataIndex: "email",
+    index: 1,
+    inputType: "input",
+    required: true,
+    placeholder: "Enter employee email",
+  },
+  PHONE: {
+    title: "Phone",
+    key: "phone",
+    dataIndex: "phone",
+    index: 2,
+    inputType: "input",
+    placeholder: "Enter employee phone",
+  },
+  DOB: {
+    title: "Birth",
+    key: "dob",
+    dataIndex: "dob",
+    index: 3,
+    inputType: "date",
+    placeholder: "Enter employee date of birth",
+  },
+  GENDER: {
+    title: "Gender",
+    key: "gender",
+    dataIndex: "gender",
+    index: 4,
+    inputType: "select",
+    options: ["male", "female"],
+    placeholder: "Enter employee gender",
+  },
+  ADDRESS: {
+    title: "Address",
+    key: "address",
+    dataIndex: "address",
+    index: 5,
+    inputType: "textarea",
+    placeholder: "Enter employee address",
+  },
+  DEPARTMENT: {
+    title: "Department",
+    key: "department",
+    dataIndex: ["department", "name"],
+    index: 6,
+    notInput: true,
+  },
+  POSITION: {
+    title: "Position",
+    key: "position",
+    dataIndex: ["position", "title"],
+    index: 6,
+    notInput: true,
+  },
+} as const);

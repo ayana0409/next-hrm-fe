@@ -50,6 +50,11 @@ const AdminSideBar = () => {
           icon: <TeamOutlined />,
         },
         {
+          key: "/dashboard/employee",
+          label: <Link href={"/dashboard/employee"}>Manage Employee</Link>,
+          icon: <TeamOutlined />,
+        },
+        {
           key: "sub1",
           label: "Navigation One",
           icon: <MailOutlined />,
