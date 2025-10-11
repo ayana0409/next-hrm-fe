@@ -8,13 +8,15 @@ import { useSession } from "next-auth/react";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/store/loading-slice";
 import { fieldsToColumns, fieldsToArray } from "@/utils/fields";
-import { Input, Space } from "antd";
+import { Input, Space, Tooltip } from "antd";
 import { SyncOutlined } from "@ant-design/icons";
 import { EMPLOYEE_FIELDS, EMPLOYEE_ROUTE } from "./employee.const";
 import CreateEmployeeButton from "./create-employee";
 import EditEmployeeButton from "./edit-employee";
 import DeleteEmployeeButton from "./delete-employee";
 import dayjs from "dayjs";
+import { ProfileOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 
 const columns = fieldsToColumns(fieldsToArray(EMPLOYEE_FIELDS));
 
@@ -26,6 +28,7 @@ export default function EmployeeTable({ filters: initialFilters }: TableProps) {
   const [searchValue, setSearchValue] = useState<string | undefined>();
   const axiosAuth = useAxiosAuth();
   const isMounted = useRef(false);
+  const router = useRouter();
 
   const fetchData = async () => {
     dispatch(startLoading());
@@ -118,6 +121,21 @@ export default function EmployeeTable({ filters: initialFilters }: TableProps) {
         meta={data?.meta}
         actions={(record) => (
           <Space>
+            <Tooltip title="Leave request" className="m-2">
+              <button
+                onClick={() =>
+                  router.push(
+                    `/dashboard/employee/emp-leave-request?id=${
+                      record.id
+                    }&fullName=${encodeURIComponent(record.fullName)}`
+                  )
+                }
+                aria-label="Edit"
+                className="bg-gray-500 text-white hover:bg-gray-800 rounded px-3 py-1 transition shadow-sm"
+              >
+                <ProfileOutlined className="mr-2" />
+              </button>
+            </Tooltip>
             <EditEmployeeButton
               onUpdated={fetchData}
               record={{ ...record, dob: dayjs(record.dob) }}

@@ -64,7 +64,13 @@ const AdminSideBar = () => {
               label: "Item 1",
               type: "group",
               children: [
-                { key: "1", label: "Option 1" },
+                {
+                  key: "/dashboard/employee",
+                  label: (
+                    <Link href={"/dashboard/employee"}>Manage Employee</Link>
+                  ),
+                  icon: <TeamOutlined />,
+                },
                 { key: "2", label: "Option 2" },
               ],
             },
