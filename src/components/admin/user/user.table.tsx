@@ -18,13 +18,14 @@ import { SyncOutlined } from "@ant-design/icons";
 const columns = fieldsToColumns(fieldsToArray(USER_FIELDS, true));
 
 export default function UserTable({ filters: initialFilters }: TableProps) {
-  const { data: session, status } = useSession({ required: true });
+  const { status } = useSession({ required: true });
   const axiosAuth = useAxiosAuth();
   const dispatch = useDispatch();
 
   const [data, setData] = useState<PagingResponse>();
   const [filters, setFilters] = useState<any>(initialFilters || {});
   const [searchValue, setSearchValue] = useState("");
+
   const isMounted = useRef(false);
 
   const fetchData = async () => {
@@ -44,6 +45,7 @@ export default function UserTable({ filters: initialFilters }: TableProps) {
       dispatch(stopLoading());
     });
   };
+
   useEffect(() => {
     if (status === "authenticated") {
       if (!isMounted.current) {
@@ -93,7 +95,7 @@ export default function UserTable({ filters: initialFilters }: TableProps) {
     <div>
       <div className="pb-4">
         <div className="flex items-center justify-between">
-          <CreateUserButton />
+          <CreateUserButton onCreated={fetchData} />
           <Space>
             <Input
               placeholder="Tìm theo username, email hoặc họ tên..."
@@ -118,8 +120,8 @@ export default function UserTable({ filters: initialFilters }: TableProps) {
         meta={data?.meta}
         actions={(record) => (
           <Space>
-            <EditUserButton record={record} />
-            <DeleteUserButton id={record._id} />
+            <EditUserButton onUpdated={fetchData} record={record} />
+            <DeleteUserButton onDeleted={fetchData} id={record._id} />
           </Space>
         )}
       />

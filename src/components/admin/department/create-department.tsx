@@ -1,7 +1,6 @@
 "use client";
 import { Button, Form, Modal, message } from "antd";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useAxiosAuth } from "@/utils/customHook";
@@ -9,11 +8,14 @@ import { DEPARTMENT_ENDPOINT, DEPARTMENT_FIELDS } from "./department.const";
 import { fieldsToArray } from "@/utils/fields";
 import { AutoFormFields } from "@/components/crud/AutoFormFields";
 
-export default function CreateDepartmentButton() {
+export default function CreateDepartmentButton({
+  onCreated,
+}: {
+  onCreated: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
   const [msg, contextHolder] = message.useMessage();
-  const router = useRouter();
   const dispatch = useDispatch();
   const axiosAuth = useAxiosAuth();
   const fieldList = fieldsToArray(DEPARTMENT_FIELDS);
@@ -27,7 +29,7 @@ export default function CreateDepartmentButton() {
         msg.success("Add successful");
         setOpen(false);
         form.resetFields();
-        router.refresh();
+        onCreated();
       })
       .catch((error) => {
         msg.error(error?.response.data.message || "Add failed");

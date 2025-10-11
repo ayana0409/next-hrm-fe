@@ -1,7 +1,6 @@
 "use client";
 import { Button, Form, Input, Modal, Space, message } from "antd";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useAxiosAuth } from "@/utils/customHook";
@@ -11,7 +10,11 @@ import { EMPLOYEE_FIELDS, EMPLOYEE_ROUTE } from "./employee.const";
 import { DepartmentSelectModal } from "../department/select-department.modal";
 import { PositionSelectModal } from "../position/select-position.modal";
 
-export default function CreateEmployeeButton() {
+export default function CreateEmployeeButton({
+  onCreated,
+}: {
+  onCreated: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
   const [msg, contextHolder] = message.useMessage();
@@ -27,7 +30,7 @@ export default function CreateEmployeeButton() {
     title: string;
     level: string;
   }>({ _id: "", title: "", level: "" });
-  const router = useRouter();
+
   const dispatch = useDispatch();
   const axiosAuth = useAxiosAuth();
   const fieldList = fieldsToArray(EMPLOYEE_FIELDS, false, true);
@@ -41,7 +44,7 @@ export default function CreateEmployeeButton() {
         msg.success("Add successful");
         setOpen(false);
         form.resetFields();
-        router.refresh();
+        onCreated();
       })
       .catch((error) => {
         msg.error(error?.response.data.message || "Add failed");

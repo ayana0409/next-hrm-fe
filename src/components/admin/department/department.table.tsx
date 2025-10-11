@@ -46,6 +46,7 @@ export default function DepartmentTable({
         dispatch(stopLoading());
       });
   };
+
   useEffect(() => {
     if (status === "authenticated") {
       if (!isMounted.current) {
@@ -95,7 +96,7 @@ export default function DepartmentTable({
     <div>
       <div className="pb-4">
         <div className="flex items-center justify-between">
-          <CreateDepartmentButton />
+          <CreateDepartmentButton onCreated={fetchData} />
           <Space>
             <Input
               placeholder="Tìm kiếm"
@@ -119,8 +120,8 @@ export default function DepartmentTable({
         meta={data?.meta}
         actions={(record) => (
           <Space>
-            <EditDepartmentButton record={record} />
-            <DeleteDepartmentButton id={record._id} />
+            <EditDepartmentButton onUpdated={fetchData} record={record} />
+            <DeleteDepartmentButton onDeleted={fetchData} id={record._id} />
           </Space>
         )}
       />

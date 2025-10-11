@@ -24,7 +24,7 @@ interface BaseSelectModalProps<T> {
   title: string; // Modal title
 }
 
-const SelectModal = <T extends { id: string }>({
+const SelectModal = <T extends { id?: string; _id?: string }>({
   visible,
   onCancel,
   onSelect,
@@ -159,7 +159,9 @@ const SelectModal = <T extends { id: string }>({
         <div className="flex-1 overflow-x-auto overflow-y-auto">
           <Spin spinning={loading}>
             <Table
-              rowKey={(record: T) => record.id}
+              rowKey={(record) =>
+                record.id ?? record._id ?? `fallback-${Math.random()}`
+              }
               dataSource={data?.items}
               columns={tableColumns}
               pagination={false}

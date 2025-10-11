@@ -97,7 +97,7 @@ export default function EmployeeTable({ filters: initialFilters }: TableProps) {
     <div>
       <div className="pb-4">
         <div className="flex items-center justify-between">
-          <CreateEmployeeButton />
+          <CreateEmployeeButton onCreated={fetchData} />
           <Space>
             <Input
               placeholder="Tìm kiếm"
@@ -122,9 +122,10 @@ export default function EmployeeTable({ filters: initialFilters }: TableProps) {
         actions={(record) => (
           <Space>
             <EditEmployeeButton
+              onUpdated={fetchData}
               record={{ ...record, dob: dayjs(record.dob) }}
             />
-            <DeleteEmployeeButton id={record.id} />
+            <DeleteEmployeeButton onDeleted={fetchData} id={record.id} />
           </Space>
         )}
       />

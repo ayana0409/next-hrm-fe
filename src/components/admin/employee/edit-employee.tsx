@@ -1,7 +1,6 @@
 "use client";
 import { Button, Form, Input, Modal, Space, Tooltip, message } from "antd";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useDispatch } from "react-redux";
 import { useAxiosAuth } from "@/utils/customHook";
@@ -12,7 +11,13 @@ import { EMPLOYEE_FIELDS, EMPLOYEE_ROUTE } from "./employee.const";
 import { DepartmentSelectModal } from "../department/select-department.modal";
 import { PositionSelectModal } from "../position/select-position.modal";
 
-export default function EditEmployeeButton({ record }: { record: any }) {
+export default function EditEmployeeButton({
+  record,
+  onUpdated,
+}: {
+  record: any;
+  onUpdated: () => void;
+}) {
   const [openDepModal, setOpenDepModal] = useState(false);
   const [selectedDepartment, setSelectedDepartment] = useState<{
     _id: string;
@@ -31,7 +36,6 @@ export default function EditEmployeeButton({ record }: { record: any }) {
   const fieldList = fieldsToArray(EMPLOYEE_FIELDS, false, true);
   const [form] = Form.useForm();
 
-  const router = useRouter();
   const dispatch = useDispatch();
   const axiosAuth = useAxiosAuth();
 
@@ -43,7 +47,7 @@ export default function EditEmployeeButton({ record }: { record: any }) {
       .then(() => {
         msg.success("Update successul");
         setOpen(false);
-        router.refresh();
+        onUpdated();
       })
       .catch((error) => {
         msg.error(error?.response.data.message || "Update failed");
@@ -88,7 +92,6 @@ export default function EditEmployeeButton({ record }: { record: any }) {
           onClick={() => {
             form.setFieldsValue(record);
             setOpen(true);
-            router.refresh();
           }}
           aria-label="Edit"
           className="bg-blue-400 text-white hover:bg-blue-800 rounded px-3 py-1 transition shadow-sm"

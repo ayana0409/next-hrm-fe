@@ -1,14 +1,17 @@
 "use client";
 import { Button, Form, Input, Modal, Select, Space, message } from "antd";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/store/loading-slice";
 import { USER_ENDPOINT } from "./user.const";
 import { useAxiosAuth } from "@/utils/customHook";
 import EmployeeSelectModal from "../employee/select-employee.modal";
 
-export default function CreateUserButton() {
+export default function CreateUserButton({
+  onCreated,
+}: {
+  onCreated: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [openEmpModal, setOpenEmpModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<{
@@ -17,7 +20,6 @@ export default function CreateUserButton() {
   }>({ id: "", fullName: "" });
   const [form] = Form.useForm();
   const [msg, contextHolder] = message.useMessage();
-  const router = useRouter();
   const dispatch = useDispatch();
   const axiosAuth = useAxiosAuth();
 
@@ -29,6 +31,7 @@ export default function CreateUserButton() {
       return;
     }
     delete values.confirmPassword;
+
     dispatch(startLoading());
     await axiosAuth
       .post(USER_ENDPOINT, values)
@@ -36,17 +39,19 @@ export default function CreateUserButton() {
         msg.success("Add successful");
         setOpen(false);
         form.resetFields();
-        router.refresh();
+        onCreated();
       })
       .catch((error) => {
         msg.error(error?.response.data.message || "Add failed");
       });
     dispatch(stopLoading());
   };
+
   const handleSelect = (employee: { id: string; fullName: string }) => {
     setSelectedEmployee(employee);
     setOpenEmpModal(false);
   };
+
   useEffect(() => {
     if (selectedEmployee?.id) {
       form.setFieldsValue({

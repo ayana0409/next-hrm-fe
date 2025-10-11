@@ -1,7 +1,6 @@
 "use client";
 import { Button, Form, Modal, message } from "antd";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/store/loading-slice";
 import { POSITION_ENDPOINT, POSITION_FIELDS } from "./position.const";
@@ -9,11 +8,14 @@ import { AutoFormFields } from "@/components/crud/AutoFormFields";
 import { useAxiosAuth } from "@/utils/customHook";
 import { fieldsToArray } from "@/utils/fields";
 
-export default function CreatePositionButton() {
+export default function CreatePositionButton({
+  onCreated,
+}: {
+  onCreated: () => void;
+}) {
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
   const [msg, contextHolder] = message.useMessage();
-  const router = useRouter();
   const dispatch = useDispatch();
   const axiosAuth = useAxiosAuth();
   const fieldList = fieldsToArray(POSITION_FIELDS);
@@ -27,7 +29,7 @@ export default function CreatePositionButton() {
         msg.success("Add successful");
         setOpen(false);
         form.resetFields();
-        router.refresh();
+        onCreated();
       })
       .catch((error) => {
         msg.error(error?.response.data.message || "Add failed");

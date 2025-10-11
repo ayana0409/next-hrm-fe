@@ -43,6 +43,7 @@ export default function PositionTable({ filters: initialFilters }: TableProps) {
       dispatch(stopLoading());
     });
   };
+
   useEffect(() => {
     if (status === "authenticated") {
       if (!isMounted.current) {
@@ -93,7 +94,7 @@ export default function PositionTable({ filters: initialFilters }: TableProps) {
     <div>
       <div className="pb-4">
         <div className="flex items-center justify-between">
-          <CreatePositionButton />
+          <CreatePositionButton onCreated={fetchData} />
           <Space>
             <Input
               placeholder="Tìm kiếm"
@@ -118,8 +119,8 @@ export default function PositionTable({ filters: initialFilters }: TableProps) {
         meta={data?.meta}
         actions={(record) => (
           <Space>
-            <EditPositionButton record={record} />
-            <DeletePositionButton id={record._id} />
+            <EditPositionButton onUpdated={fetchData} record={record} />
+            <DeletePositionButton onDeleted={fetchData} id={record._id} />
           </Space>
         )}
       />
