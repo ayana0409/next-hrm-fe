@@ -17,7 +17,7 @@ export default function CreateLeaveRequestButton({
   employee,
   onCreated,
 }: {
-  employee: { id: string; fullName: string };
+  employee?: { id: string; fullName: string };
   onCreated: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -25,22 +25,16 @@ export default function CreateLeaveRequestButton({
   const [selectedEmployee, setSelectedEmployee] = useState<{
     id: string;
     fullName: string;
-  }>(employee);
+  }>(employee || { id: "", fullName: "" });
   const [form] = Form.useForm();
   const [msg, contextHolder] = message.useMessage();
   const dispatch = useDispatch();
   const axiosAuth = useAxiosAuth();
 
-  const fieldList = fieldsToArray(LEAVE_REQUEST_FIELDS);
+  const fieldList = fieldsToArray(LEAVE_REQUEST_FIELDS, false, true);
 
   const onSubmit = async () => {
     const values = await form.validateFields();
-    if (String(values.password) !== String(values.confirmPassword)) {
-      msg.error("Mật khẩu xác nhận không khớp");
-      dispatch(stopLoading());
-      return;
-    }
-    delete values.confirmPassword;
 
     dispatch(startLoading());
     await axiosAuth
@@ -87,6 +81,7 @@ export default function CreateLeaveRequestButton({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 lg:grid-cols-1">
             <Form.Item
               label="Employee"
+              required
               rules={[{ required: true, message: "Employee is required" }]}
             >
               <Space.Compact style={{ width: "100%" }}>

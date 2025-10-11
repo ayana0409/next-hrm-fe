@@ -43,5 +43,6 @@ export function fieldsToColumns(fields: FieldDef[]): ColumnsType<any> {
     key: f.key,
     fixed: f.fixed,
     width: f.width,
+    render: f.render,
   }));
 }

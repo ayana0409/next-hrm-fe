@@ -49,39 +49,27 @@ const AdminSideBar = () => {
           label: <Link href={"/dashboard/position"}>Manage Position</Link>,
           icon: <TeamOutlined />,
         },
-        {
-          key: "/dashboard/employee",
-          label: <Link href={"/dashboard/employee"}>Manage Employee</Link>,
-          icon: <TeamOutlined />,
-        },
+        // {
+        //   key: "/dashboard/employee",
+        //   label: <Link href={"/dashboard/employee"}>Manage Employee</Link>,
+        //   icon: <TeamOutlined />,
+        // },
         {
           key: "sub1",
-          label: "Navigation One",
+          label: "Employee",
           icon: <MailOutlined />,
           children: [
             {
-              key: "g1",
-              label: "Item 1",
-              type: "group",
-              children: [
-                {
-                  key: "/dashboard/employee",
-                  label: (
-                    <Link href={"/dashboard/employee"}>Manage Employee</Link>
-                  ),
-                  icon: <TeamOutlined />,
-                },
-                { key: "2", label: "Option 2" },
-              ],
+              key: "/dashboard/employee",
+              label: <Link href={"/dashboard/employee"}>Manage Employee</Link>,
+              icon: <TeamOutlined />,
             },
             {
-              key: "g2",
-              label: "Item 2",
-              type: "group",
-              children: [
-                { key: "3", label: "Option 3" },
-                { key: "4", label: "Option 4" },
-              ],
+              key: "/dashboard/leave-request",
+              label: (
+                <Link href={"/dashboard/leave-request"}>Leave Request</Link>
+              ),
+              icon: <TeamOutlined />,
             },
           ],
         },

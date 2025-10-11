@@ -28,7 +28,7 @@ export default function EditLeaveRequestButton({
   onUpdated,
 }: {
   record: any;
-  employee: { id: string; fullName: string };
+  employee?: { id: string; fullName: string };
   onUpdated: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -36,13 +36,18 @@ export default function EditLeaveRequestButton({
   const [selectedEmployee, setSelectedEmployee] = useState<{
     id: string;
     fullName: string;
-  }>(employee);
+  }>(
+    employee || {
+        id: record.employee._id,
+        fullName: record.employee.fullName,
+      } || { id: "", fullName: "" }
+  );
 
   const [form] = Form.useForm();
   const [msg, contextHolder] = message.useMessage();
   const dispatch = useDispatch();
   const axiosAuth = useAxiosAuth();
-  const fieldList = fieldsToArray(LEAVE_REQUEST_FIELDS);
+  const fieldList = fieldsToArray(LEAVE_REQUEST_FIELDS, false, true);
 
   const onSubmit = async () => {
     const values = await form.validateFields();
@@ -98,7 +103,11 @@ export default function EditLeaveRequestButton({
       >
         <Form form={form} layout="vertical">
           <div className="grid grid-cols-1 gap-4">
-            <Form.Item label="Employee">
+            <Form.Item
+              label="Employee"
+              required
+              rules={[{ required: true, message: "Employee is required" }]}
+            >
               <Space.Compact style={{ width: "100%" }}>
                 <Input disabled value={selectedEmployee?.fullName || ""} />
                 <Button type="primary" onClick={() => setOpenEmpModal(true)}>

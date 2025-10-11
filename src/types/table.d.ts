@@ -12,6 +12,7 @@ export type FieldDef = {
   placeholder?: string;
   width?: number;
   responsive?: string[];
+  render?: any;
 
   hidden?: boolean; // hidden on table
   notInput?: boolean; // hidden on form
