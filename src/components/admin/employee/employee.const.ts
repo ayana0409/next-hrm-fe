@@ -53,7 +53,7 @@ export const EMPLOYEE_FIELDS = makeFields({
     key: "address",
     dataIndex: "address",
     index: 5,
-    inputType: "textarea",
+    inputType: "input",
     placeholder: "Enter employee address",
   },
   DEPARTMENT: {

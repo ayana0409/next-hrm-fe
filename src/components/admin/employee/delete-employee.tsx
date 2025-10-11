@@ -47,7 +47,7 @@ export default function DeleteEmployeeButton({
         onOk={onConfirm}
         onCancel={() => setOpen(false)}
       >
-        Are you sure you want to delete this Department?
+        Are you sure you want to delete this Employee?
       </Modal>
     </>
   );

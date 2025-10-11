@@ -1,5 +1,5 @@
 "use client";
-import { Button, Form, Modal, Tooltip, message } from "antd";
+import { Form, Modal, Tooltip, message } from "antd";
 import { useState } from "react";
 import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useDispatch } from "react-redux";
@@ -60,9 +60,19 @@ export default function EditDepartmentButton({
         open={open}
         onOk={onSubmit}
         onCancel={() => setOpen(false)}
+        width={{
+          xs: "95%",
+          sm: "85%",
+          md: "70%",
+          lg: "70%",
+          xl: "70%",
+          xxl: "60%",
+        }}
       >
         <Form form={form} layout="vertical">
-          <AutoFormFields fields={fieldList} />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 lg:grid-cols-1">
+            <AutoFormFields fields={fieldList} />
+          </div>
         </Form>
       </Modal>
     </>

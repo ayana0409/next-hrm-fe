@@ -1,9 +1,6 @@
 "use client";
 import CrudTable from "../../crud/CrudTable";
 import { PagingResponse } from "../../crud/crud-types";
-import DeleteDepartmentButton from "./delete-employee";
-import EditDepartmentButton from "./edit-employee";
-import CreateDepartmentButton from "./create-employee";
 import { TableProps } from "@/types/table";
 import { useAxiosAuth } from "@/utils/customHook";
 import { useEffect, useRef, useState } from "react";
