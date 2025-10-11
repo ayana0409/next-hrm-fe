@@ -163,7 +163,7 @@ export default function LeaveRequestTable({
     <div>
       {contextHolder}
       <Title level={2} className="text-center uppercase">
-        leave request
+        leave request management
       </Title>
       <div className="pb-4">
         <div className="items-center justify-between lg:flex ms:grid grid-cols-1">

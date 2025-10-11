@@ -17,6 +17,7 @@ import DeleteEmployeeButton from "./delete-employee";
 import dayjs from "dayjs";
 import { ProfileOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
+import Title from "antd/es/typography/Title";
 
 const columns = fieldsToColumns(fieldsToArray(EMPLOYEE_FIELDS));
 
@@ -95,15 +96,19 @@ export default function EmployeeTable({ filters: initialFilters }: TableProps) {
 
   return (
     <div>
+      <Title level={2} className="text-center uppercase">
+        employee management
+      </Title>
       <div className="pb-4">
-        <div className="flex items-center justify-between">
-          <CreateEmployeeButton onCreated={fetchData} />
-          <Space>
+        <div className="items-center justify-between lg:flex ms:grid grid-cols-1">
+          <div className="text-center lg:text-left pb-2">
+            <CreateEmployeeButton onCreated={fetchData} />
+          </div>
+          <Space className="border rounded-md p-2 w-full bg-gray-300 lg:w-fit justify-between">
             <Input
               placeholder="Tìm kiếm"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              style={{ width: 300 }}
               allowClear
             />
             <button

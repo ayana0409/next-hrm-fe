@@ -14,6 +14,7 @@ import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { Input, Space } from "antd";
 import { SyncOutlined } from "@ant-design/icons";
+import Title from "antd/es/typography/Title";
 
 const columns = fieldsToColumns(fieldsToArray(POSITION_FIELDS));
 
@@ -92,15 +93,19 @@ export default function PositionTable({ filters: initialFilters }: TableProps) {
 
   return (
     <div>
+      <Title level={2} className="text-center uppercase">
+        position management
+      </Title>
       <div className="pb-4">
-        <div className="flex items-center justify-between">
-          <CreatePositionButton onCreated={fetchData} />
-          <Space>
+        <div className="items-center justify-between lg:flex ms:grid grid-cols-1">
+          <div className="text-center lg:text-left pb-2">
+            <CreatePositionButton onCreated={fetchData} />
+          </div>
+          <Space className="border rounded-md p-2 w-full bg-gray-300 lg:w-fit justify-between">
             <Input
               placeholder="Tìm kiếm"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              style={{ width: 300 }}
               allowClear
             />
             <button
