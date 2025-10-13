@@ -30,6 +30,7 @@ export const EMPLOYEE_FIELDS = makeFields({
     index: 2,
     inputType: "input",
     placeholder: "Enter employee phone",
+    required: true,
   },
   DOB: {
     title: "Birth",
@@ -38,6 +39,7 @@ export const EMPLOYEE_FIELDS = makeFields({
     index: 3,
     inputType: "date",
     placeholder: "Enter employee date of birth",
+    required: true,
   },
   GENDER: {
     title: "Gender",
@@ -47,6 +49,7 @@ export const EMPLOYEE_FIELDS = makeFields({
     inputType: "select",
     options: ["male", "female"],
     placeholder: "Enter employee gender",
+    required: true,
   },
   ADDRESS: {
     title: "Address",

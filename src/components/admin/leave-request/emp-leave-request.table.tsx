@@ -31,7 +31,6 @@ export default function EmpLeaveRequestTable(initialEmployee: Employee) {
   const dispatch = useDispatch();
 
   const [data, setData] = useState();
-  const [open, setOpen] = useState(false);
   const [employee, setEmployee] = useState<Employee>(initialEmployee);
   const [searchValue, setSearchValue] = useState("");
 
@@ -93,7 +92,6 @@ export default function EmpLeaveRequestTable(initialEmployee: Employee) {
       .get(`${LEAVE_REQUEST_ENDPOINT}/employee/${employee.id}`)
       .then((res) => {
         if (!res) return;
-
         setData(res.data.data);
         dispatch(stopLoading());
       });

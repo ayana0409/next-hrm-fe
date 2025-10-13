@@ -75,7 +75,7 @@ export default function CreateEmployeeButton({
   useEffect(() => {
     if (selectedPosition?._id) {
       form.setFieldsValue({
-        possitonId: selectedPosition._id,
+        positionId: selectedPosition._id,
       });
     }
   }, [selectedPosition]);
@@ -105,34 +105,71 @@ export default function CreateEmployeeButton({
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <AutoFormFields fields={fieldList} />
 
-            <Form.Item label="Department">
-              <Space.Compact style={{ width: "100%" }}>
-                <Input disabled value={selectedDepartment?.name || ""} />
-                <Button type="primary" onClick={() => setOpenDepModal(true)}>
-                  Chose
-                </Button>
-              </Space.Compact>
-            </Form.Item>
-            <Form.Item name="departmentId" hidden={true}>
-              <Input disabled />
+            {/* Hiển thị Department */}
+            <Form.Item
+              name="departmentId"
+              rules={[{ required: true, message: "Department là bắt buộc" }]}
+              style={{ display: "none" }}
+            >
+              <Input />
             </Form.Item>
 
-            <Form.Item label="Position">
-              <Space.Compact style={{ width: "100%" }}>
-                <Input
-                  disabled
-                  value={
-                    selectedPosition?.title + " - " + selectedPosition?.level ||
-                    ""
-                  }
-                />
-                <Button type="primary" onClick={() => setOpenPosModal(true)}>
-                  Chose
-                </Button>
-              </Space.Compact>
+            {/* Field hiển thị + lỗi */}
+            <Form.Item shouldUpdate label="Department">
+              {({ getFieldError }) => (
+                <>
+                  <Space.Compact style={{ width: "100%" }}>
+                    <Input disabled value={selectedDepartment?.name || ""} />
+                    <Button
+                      type="primary"
+                      onClick={() => setOpenDepModal(true)}
+                    >
+                      Chose
+                    </Button>
+                  </Space.Compact>
+                  <Form.ErrorList
+                    errors={getFieldError("departmentId")}
+                    className="text-red-500 text-sm"
+                  />
+                </>
+              )}
             </Form.Item>
-            <Form.Item name="positionId" hidden={true}>
-              <Input disabled />
+
+            {/* Hiển thị Position */}
+            <Form.Item
+              name="positionId"
+              rules={[{ required: true, message: "Position là bắt buộc" }]}
+              style={{ display: "none" }}
+            >
+              <Input />
+            </Form.Item>
+
+            {/* Field hiển thị + lỗi */}
+            <Form.Item shouldUpdate label="Position">
+              {({ getFieldError }) => (
+                <>
+                  <Space.Compact style={{ width: "100%" }}>
+                    <Input
+                      disabled
+                      value={
+                        selectedPosition
+                          ? `${selectedPosition.title} - ${selectedPosition.level}`
+                          : ""
+                      }
+                    />
+                    <Button
+                      type="primary"
+                      onClick={() => setOpenPosModal(true)}
+                    >
+                      Chose
+                    </Button>
+                  </Space.Compact>
+                  <Form.ErrorList
+                    errors={getFieldError("positionId")}
+                    className="text-red-500 text-sm"
+                  />
+                </>
+              )}
             </Form.Item>
           </div>
         </Form>
