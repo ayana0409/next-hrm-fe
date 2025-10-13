@@ -42,14 +42,41 @@ export default function LeaveRequestTable({
 
   const isMounted = useRef(false);
 
+  const addedColumn = [
+    {
+      title: "Name",
+      key: "fullName",
+      dataIndex: ["employee", "fullName"],
+      fixed: true,
+      width: 200,
+    },
+    {
+      title: "Phone",
+      key: "phone",
+      dataIndex: ["employee", "phone"],
+    },
+    ...columns,
+    {
+      title: "Department",
+      key: "department",
+      dataIndex: ["department", "name"],
+    },
+    {
+      title: "Position",
+      key: "position",
+      render: (_: any, record: any) =>
+        `${record.position.title} - ${record.position.level}`,
+    },
+  ];
+
   const fetchData = async () => {
-    console.log(filters);
     dispatch(startLoading());
     await axiosAuth
       .get(LEAVE_REQUEST_ENDPOINT, { params: filters })
       .then((res) => {
         if (!res) return;
         const { items, current, pageSize, pages, totalItem } = res.data.data;
+
         setData({
           items,
           meta: {
@@ -125,34 +152,6 @@ export default function LeaveRequestTable({
     }
   }, [status, filters]);
 
-  // useEffect(() => {
-  //   if (status === "authenticated") {
-  //     const timeout = setTimeout(() => {
-  //       let newFilters = filters;
-
-  //       if (searchValue) {
-  //         const filterObj = JSON.stringify({
-  //           $or: [
-  //             { username: { $regex: searchValue, $options: "i" } },
-  //             { role: { $regex: searchValue, $options: "i" } },
-  //           ],
-  //         });
-  //         if (newFilters.filter !== filterObj) {
-  //           newFilters = { ...newFilters, filter: filterObj };
-  //         }
-  //       } else if (newFilters.filter) {
-  //         newFilters = { ...newFilters };
-  //         delete newFilters.filter;
-  //       }
-
-  //       if (newFilters !== filters) {
-  //         setFilters(newFilters);
-  //       }
-  //     }, 500);
-  //     return () => clearTimeout(timeout);
-  //   }
-  // }, [searchValue]);
-
   useEffect(() => {
     if (JSON.stringify(initialFilters) !== JSON.stringify(filters)) {
       setFilters({ ...initialFilters, filter: filters.filter });
@@ -203,7 +202,7 @@ export default function LeaveRequestTable({
       </div>
 
       <CrudTable
-        columns={columns}
+        columns={addedColumn}
         items={data?.items}
         meta={data?.meta}
         actions={(record) => (
