@@ -7,15 +7,15 @@ import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { Input, message, Space, Table, Tooltip } from "antd";
 import { SyncOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import CreateLeaveRequestButton from "./create-leave-request";
-import EditLeaveRequestButton from "./edit-leave-request";
+import CreateLeaveRequestButton from "../leave-request/create-leave-request";
+import EditLeaveRequestButton from "../leave-request/edit-leave-request";
 import {
   LEAVE_REQUEST_ENDPOINT,
   LEAVE_REQUEST_FIELDS,
   LeaveRequestStatusEnum,
-} from "./leave-request.const";
+} from "../leave-request/leave-request.const";
 import dayjs from "dayjs";
-import form from "antd/es/form";
+import EmpAttendanceTable from "../attendance/emp-attendance.table";
 
 const columns = fieldsToColumns(fieldsToArray(LEAVE_REQUEST_FIELDS, true));
 

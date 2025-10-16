@@ -126,11 +126,11 @@ export default function EmployeeTable({ filters: initialFilters }: TableProps) {
         meta={data?.meta}
         actions={(record) => (
           <Space>
-            <Tooltip title="Leave request" className="m-2">
+            <Tooltip title="Detail" className="m-2">
               <button
                 onClick={() =>
                   router.push(
-                    `/dashboard/employee/emp-leave-request?id=${
+                    `/dashboard/employee/detail?id=${
                       record.id
                     }&fullName=${encodeURIComponent(record.fullName)}`
                   )
