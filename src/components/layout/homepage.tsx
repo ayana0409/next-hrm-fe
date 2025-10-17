@@ -36,28 +36,34 @@ const WebcamAttendance: React.FC = () => {
   // Gửi ảnh base64 đến NestJS API
   const sendToBackend = async (imageBase64: string) => {
     dispatch(startLoading());
-    try {
-      const response = await api.post("attendance/image", {
+    await api
+      .post("attendance/image", {
         image: imageBase64,
+      })
+      .then((response) => {
+        const data = response.data as AttendanceResponse;
+        if (data.success) {
+          msg.success(`Chấm công thành công cho user: ${data.fullName}`, 3);
+          // Hiển thị thông báo UI (e.g., toast)
+        } else {
+          msg.warning(`${data.fullName} đã check out hôm nay`, 3);
+        }
+      })
+      .catch((error) => {
+        if (error.response.data.statusCode === 400) {
+          msg.warning("No face detected", 3);
+          return;
+        }
+        if (error.response.data.statusCode === 404) {
+          msg.warning("No employee match", 3);
+          return;
+        }
+        console.error("Lỗi gửi ảnh:", error.response.data);
+        msg.error("Internal server error", 3);
+      })
+      .finally(() => {
+        dispatch(stopLoading());
       });
-      const data = response.data as AttendanceResponse;
-      console.log(data);
-      if (data.success) {
-        msg.success(`Chấm công thành công cho user: ${data.fullName}`, 3);
-        // Hiển thị thông báo UI (e.g., toast)
-      } else {
-        msg.warning(`${data.fullName} đã check out hôm nay`, 3);
-      }
-    } catch (error: any) {
-      console.error("Lỗi gửi ảnh:", error);
-      if (error.response.data.message === "No face detected") {
-        msg.warning(`Không phát hiện được khuôn mặt`, 3);
-        return;
-      }
-      msg.error("Lỗi hệ thống");
-    } finally {
-      dispatch(stopLoading());
-    }
   };
 
   // Bắt đầu capture định kỳ (mỗi 5 giây)
