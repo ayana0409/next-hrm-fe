@@ -8,3 +8,12 @@
   height: 100%;
   width: 100%;
 }
+
+.ant-message-custom-content {
+  font-size: 20px; /* Tăng kích thước chữ */
+  padding: 12px 16px;
+}
+
+.ant-message {
+  max-width: 600px; /* Tăng chiều rộng nếu cần */
+}
