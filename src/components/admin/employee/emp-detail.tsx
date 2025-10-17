@@ -4,6 +4,11 @@ import { EMPLOYEE_ROUTE } from "./employee.const";
 import { useAxiosAuth } from "@/utils/customHook";
 import { message, Tooltip, Upload } from "antd";
 import { getBase64 } from "@/utils/file";
+import EditEmployeeButton from "./edit-employee";
+import dayjs from "dayjs";
+import EmpFaceRegisterDetail from "./emp-register-face";
+import { startLoading, stopLoading } from "@/store/loading-slice";
+import { useDispatch } from "react-redux";
 
 interface Employee {
   _id: string;
@@ -21,10 +26,11 @@ interface Employee {
   endDate?: string;
   updatedAt?: string;
 }
-const DEFAULT_AVATAR = "https://via.placeholder.com/150"; // ảnh tạm
+const DEFAULT_AVATAR = "/images/employee/avatar-preview.png"; // ảnh tạm
 export default function EmployeeDetail({ employeeId }: { employeeId: string }) {
   const [imageUrl, setImageUrl] = useState<string>(DEFAULT_AVATAR);
   const [employee, setEmployee] = useState<Employee>();
+  const dispatch = useDispatch();
   const axiosAuth = useAxiosAuth();
 
   const fetchData = async () => {
@@ -41,12 +47,13 @@ export default function EmployeeDetail({ employeeId }: { employeeId: string }) {
   const beforeUpload = (file: File) => {
     const isImage = file.type.startsWith("image/");
     const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isImage) message.error("Chỉ được upload ảnh!");
-    if (!isLt2M) message.error("Ảnh phải nhỏ hơn 2MB!");
+    if (!isImage) message.error("Can only upload image!");
+    if (!isLt2M) message.error("Image must be lower than 2MB!");
     return isImage && isLt2M;
   };
 
   const customUpload = async ({ file, onSuccess, onError }: any) => {
+    dispatch(startLoading());
     await axiosAuth
       .post(`${EMPLOYEE_ROUTE}/${employeeId}/avatar`, {
         image: await getBase64(file),
@@ -60,6 +67,9 @@ export default function EmployeeDetail({ employeeId }: { employeeId: string }) {
         message.error("Upload failed!");
         console.log(err.response);
         onError(err);
+      })
+      .finally(() => {
+        dispatch(stopLoading());
       });
   };
 
@@ -76,7 +86,7 @@ export default function EmployeeDetail({ employeeId }: { employeeId: string }) {
           >
             <Tooltip title="Click to upload" className="m-2">
               <img
-                src={imageUrl}
+                src={imageUrl || DEFAULT_AVATAR}
                 alt="avatar"
                 style={{
                   objectFit: "cover",
@@ -129,6 +139,15 @@ export default function EmployeeDetail({ employeeId }: { employeeId: string }) {
             <span className="font-normal">{employee?.updatedAt}</span>
           </div>
         </div>
+        {employee && (
+          <div className="flex gap-3">
+            <EditEmployeeButton
+              record={{ ...employee, dob: dayjs(employee?.dob) }}
+              onUpdated={fetchData}
+            />
+            <EmpFaceRegisterDetail employeeId={employeeId} />
+          </div>
+        )}
       </div>
     </div>
   );
