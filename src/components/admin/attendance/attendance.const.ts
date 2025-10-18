@@ -27,3 +27,9 @@ export const ATTENDANCE_FIELDS = makeFields({
   //   inputType: "input",
   // },
 } as const);
+
+export const attendanceTableInstructs = [
+  { color: "#FF5959", label: "On time" },
+  { color: "#FFB66B", label: "Half day" },
+  { color: "#72FF6B", label: "Full day" },
+];
