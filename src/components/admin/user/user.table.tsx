@@ -15,6 +15,7 @@ import { useDispatch } from "react-redux";
 import { Input, Space } from "antd";
 import { SyncOutlined } from "@ant-design/icons";
 import Title from "antd/es/typography/Title";
+import UserChangePasswordButton from "./user-change-password";
 
 const columns = fieldsToColumns(fieldsToArray(USER_FIELDS, true));
 
@@ -126,6 +127,7 @@ export default function UserTable({ filters: initialFilters }: TableProps) {
         actions={(record) => (
           <Space>
             <EditUserButton onUpdated={fetchData} record={record} />
+            <UserChangePasswordButton userId={record._id} />
             <DeleteUserButton onDeleted={fetchData} id={record._id} />
           </Space>
         )}
