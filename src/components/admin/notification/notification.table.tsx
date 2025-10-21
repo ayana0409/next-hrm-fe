@@ -15,6 +15,9 @@ import dayjs, { Dayjs } from "dayjs";
 import Title from "antd/es/typography/Title";
 import EmployeeMutiSelectModal from "../employee/muti-select-employee.modal";
 import CreateNotificationButton from "./create-notifitaion";
+import { DepartmentSelectModal } from "../department/select-department.modal";
+import EmployeeSelectModal from "../employee/select-employee.modal";
+import { PositionSelectModal } from "../position/select-position.modal";
 
 const column = [
   {
@@ -29,45 +32,20 @@ export default function NotificationTable({
   const { status } = useSession({ required: true });
   const axiosAuth = useAxiosAuth();
   const dispatch = useDispatch();
-  const [msg, contextHolder] = message.useMessage();
-  const { RangePicker } = DatePicker;
+  const [openEmpModal, setOpenEmpModal] = useState(false);
+  const [openDepModal, setOpenDepModal] = useState(false);
+  const [openPosModal, setOpenPosModal] = useState(false);
+  const isMounted = useRef(false);
 
   const [data, setData] = useState<PagingResponse>();
   const [filters, setFilters] = useState<any>(initialFilters || {});
-  const [searchStatus, setSearchStatus] = useState();
-  const [openEmpModal, setOpenEmpModal] = useState(false);
-  const [searchDate, setSearchDate] = useState<
-    [start: Dayjs | null | undefined, end: Dayjs | null | undefined]
-  >([null, null]);
-
-  const isMounted = useRef(false);
 
   const fetchData = async () => {
     dispatch(startLoading());
 
     try {
-      // Lấy filter động từ state (ví dụ: "position" | "department" | "user")
-      const { type, id, current, pageSize } = filters;
-
-      // Gửi đúng query param tùy theo loại filter
-      const params: Record<string, any> = {
-        current: current || 1,
-        pageSize: pageSize || 10,
-      };
-
-      if (type === "user" && id) {
-        params.userId = id;
-      } else if (type === "department" && id) {
-        params.targetType = "DEPARTMENT";
-        params.targetId = id;
-      } else if (type === "position" && id) {
-        params.targetType = "POSITION";
-        params.targetId = id;
-      }
-
-      // Gọi API
       const res = await axiosAuth.get(`${NOTIFICATION_ENDPOINT}/paged`, {
-        params,
+        params: filters,
       });
 
       if (res?.data?.data) {
@@ -149,13 +127,16 @@ export default function NotificationTable({
 
   useEffect(() => {
     if (JSON.stringify(initialFilters) !== JSON.stringify(filters)) {
-      setFilters({ ...initialFilters, filter: filters.filter });
+      setFilters({
+        ...filters,
+        pageSize: initialFilters?.pageSize || 10,
+        current: initialFilters?.current || 1,
+      });
     }
   }, [initialFilters]);
 
   return (
     <div>
-      {contextHolder}
       <Title level={2} className="text-center uppercase">
         notification management
       </Title>
@@ -164,30 +145,65 @@ export default function NotificationTable({
           <div className="text-center lg:text-left pb-2">
             <CreateNotificationButton onCreated={fetchData} />
           </div>
-          {/* <Space className="border rounded-md p-2 w-full bg-gray-300 lg:w-fit justify-between">
-           
+          <Space className="border rounded-md p-2 w-full bg-gray-300 lg:w-fit justify-between">
             <Select
-              placeholder="Tìm theo trạng thái"
-              value={searchStatus}
+              placeholder="Read Status"
+              value={filters.read}
               options={[
-                { label: "Pending", value: "pending" },
-                { label: "Approved", value: "approved" },
-                { label: "Rejected", value: "rejected" },
+                { label: "Seen", value: true },
+                { label: "Un seen", value: false },
               ]}
-              onChange={(value) => handleStatusChange(value)}
+              onChange={(value) =>
+                setFilters((prev: any) => ({ ...prev, read: value }))
+              }
               allowClear
             />
+            |
+            <Select
+              placeholder="Chose Notification Type"
+              value={filters.targetType}
+              options={[
+                { label: "Individual", value: "individual" },
+                { label: "Department", value: "department" },
+                { label: "Position", value: "position" },
+              ]}
+              onChange={(value) =>
+                setFilters((prev: any) => ({
+                  ...prev,
+                  targetType: value,
+                  targetId: undefined,
+                }))
+              }
+              allowClear
+            />
+            {filters.targetType === "individual" && (
+              <Button type="primary" onClick={() => setOpenEmpModal(true)}>
+                Chose Employee
+              </Button>
+            )}
+            {filters.targetType === "department" && (
+              <Button type="primary" onClick={() => setOpenDepModal(true)}>
+                Chose Department
+              </Button>
+            )}
+            {filters.targetType === "position" && (
+              <Button type="primary" onClick={() => setOpenPosModal(true)}>
+                Chose Position
+              </Button>
+            )}
             |
             <button
               className="bg-gray-400 text-shadow-neutral-950 hover:bg-gray-600 rounded px-3 py-1 transition shadow-sm"
               onClick={() => {
-                handleStatusChange(undefined);
-                handleDateChange([null, null]);
+                setFilters((prev: any) => {
+                  const { targetType, targetId, read, ...rest } = prev;
+                  return rest;
+                });
               }}
             >
               <SyncOutlined />
             </button>
-          </Space> */}
+          </Space>
         </div>
       </div>
 
@@ -238,6 +254,27 @@ export default function NotificationTable({
         //     )}
         //   </Space>
         // )}
+      />
+      <EmployeeSelectModal
+        visible={openEmpModal}
+        onCancel={() => setOpenEmpModal(false)}
+        onSelect={(value: any) =>
+          setFilters((prev: any) => ({ ...prev, targetId: value }))
+        }
+      />
+      <DepartmentSelectModal
+        visible={openDepModal}
+        onCancel={() => setOpenDepModal(false)}
+        onSelect={(value: any) =>
+          setFilters((prev: any) => ({ ...prev, targetId: value._id }))
+        }
+      />
+      <PositionSelectModal
+        visible={openPosModal}
+        onCancel={() => setOpenPosModal(false)}
+        onSelect={(value: any) =>
+          setFilters((prev: any) => ({ ...prev, targetId: value._id }))
+        }
       />
     </div>
   );
