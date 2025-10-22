@@ -27,6 +27,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             role: user.roles,
             access_token: accessToken,
             refresh_token: refreshToken,
+            employeeId: user.employeeId,
           };
         } catch (error: any) {
           if (error.response?.status === 401) return null;
@@ -70,6 +71,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.refresh_token = token.refresh_token as string;
       session.user = token.user as any;
       session.error = token.error as string | undefined;
+      session.employeeId = token.user.employeeId;
 
       return session;
     },
