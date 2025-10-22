@@ -15,7 +15,7 @@ const EmployeeHeader = () => {
   const items: MenuProps["items"] = [
     {
       key: "1",
-      label: <a href="/https://www.antgroup.com">Home</a>,
+      label: <a href="/">Home</a>,
     },
 
     {
@@ -26,20 +26,15 @@ const EmployeeHeader = () => {
     },
     {
       key: "3",
+      danger: true,
       label: (
         <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.luohanacademy.com"
+          className="bg-red-400 hover:bg-red-800 text-white font-bold"
+          onClick={() => signOut()}
         >
-          3rd menu item (disabled)
+          LOG OUT
         </a>
       ),
-      disabled: true,
-    },
-    {
-      key: "4",
-      label: <a onClick={() => signOut()}>LOG OUT</a>,
     },
   ];
 

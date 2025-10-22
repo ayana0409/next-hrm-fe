@@ -1,6 +1,11 @@
 "use client";
 import { AdminContext } from "@/library/admin.context";
-import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import {
+  LoginOutlined,
+  LogoutOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+} from "@ant-design/icons";
 import { Button, Layout } from "antd";
 import { useContext } from "react";
 import { DownOutlined, SmileOutlined } from "@ant-design/icons";
@@ -11,7 +16,7 @@ import { signOut, useSession } from "next-auth/react";
 const HomeHeader = () => {
   const { data: session, status } = useSession();
   const { Header } = Layout;
-  console.log("HomeHeader session:", session);
+
   const items: MenuProps["items"] = [
     {
       key: "1",
@@ -30,23 +35,18 @@ const HomeHeader = () => {
     },
     {
       key: "3",
-      label: (
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://www.luohanacademy.com"
-        >
-          3rd menu item (disabled)
-        </a>
-      ),
-      disabled: true,
-    },
-    {
-      key: "4",
+      danger: session ? true : false,
       label: session ? (
-        <a onClick={() => signOut()}>LOG OUT</a>
+        <a
+          className="bg-red-400 hover:bg-red-800 text-white font-bold"
+          onClick={() => signOut()}
+        >
+          <LogoutOutlined /> LOG OUT
+        </a>
       ) : (
-        <a href="auth/login">LOGIN</a>
+        <a href="auth/login" className="font-bold">
+          <LoginOutlined /> LOGIN
+        </a>
       ),
     },
   ];
