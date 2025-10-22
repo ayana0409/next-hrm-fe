@@ -43,7 +43,12 @@ const EmpDetailPage = async ({ searchParams }: IProp) => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="col-span-2">
-          <EmpLeaveRequestTable fullName={fullName} id={id} />
+          <EmpLeaveRequestTable
+            initialEmployee={{
+              fullName,
+              id,
+            }}
+          />
         </div>
       </div>
     </div>
