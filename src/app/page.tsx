@@ -1,3 +1,6 @@
+import HomeContent from "@/components/layout/home/home.content";
+import HomeFooter from "@/components/layout/home/home.footer";
+import HomeHeader from "@/components/layout/home/home.header";
 import WebcamAttendance from "@/components/layout/homepage";
 interface IProp {
   searchParams: { id: string; fullName: string };
@@ -18,7 +21,13 @@ export default async function Home({ searchParams }: IProp) {
   filters.pageSize = Number(filters.pageSize ?? 10);
   return (
     <div>
-      <WebcamAttendance filters={filters} />
+      <div className="flex-1 overflow-hidden">
+        <HomeHeader />
+        <HomeContent>
+          <WebcamAttendance filters={filters} />
+        </HomeContent>
+        <HomeFooter />
+      </div>
     </div>
   );
 }
