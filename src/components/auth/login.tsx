@@ -17,7 +17,7 @@ const Login = () => {
     } else if (res?.error) {
       setError("Lỗi hệ thống");
     } else {
-      router.push("/dashboard");
+      router.push("/");
     }
   };
 
