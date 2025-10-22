@@ -27,9 +27,11 @@ interface Employee {
 export default function EmpLeaveRequestTable({
   initialEmployee,
   hideAction,
+  hideChooseEmp,
 }: {
   initialEmployee: Employee;
   hideAction?: boolean;
+  hideChooseEmp?: boolean;
 }) {
   const { status } = useSession({ required: true });
   const axiosAuth = useAxiosAuth();
@@ -140,22 +142,8 @@ export default function EmpLeaveRequestTable({
             <CreateLeaveRequestButton
               employee={employee}
               onCreated={fetchData}
+              hideChooseEmp={hideChooseEmp}
             />
-            <Space>
-              <Input
-                placeholder="Tìm theo username, email hoặc họ tên..."
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                style={{ width: 300 }}
-                allowClear
-              />
-              <button
-                className="bg-gray-400 text-shadow-neutral-950 hover:bg-gray-600 rounded px-3 py-1 transition shadow-sm"
-                onClick={() => setSearchValue("")}
-              >
-                <SyncOutlined />
-              </button>
-            </Space>
           </div>
         </div>
         <div className="flex-1 overflow-x-auto overflow-y-auto">
