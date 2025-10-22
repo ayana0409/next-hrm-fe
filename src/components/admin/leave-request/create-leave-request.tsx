@@ -16,9 +16,11 @@ import { PlusSquareOutlined } from "@ant-design/icons";
 export default function CreateLeaveRequestButton({
   employee,
   onCreated,
+  hideChooseEmp,
 }: {
   employee?: { id: string; fullName: string };
   onCreated: () => void;
+  hideChooseEmp?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [openEmpModal, setOpenEmpModal] = useState(false);
@@ -79,22 +81,34 @@ export default function CreateLeaveRequestButton({
       >
         <Form form={form} layout="vertical">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 lg:grid-cols-1">
-            <Form.Item
-              label="Employee"
-              required
-              rules={[{ required: true, message: "Employee is required" }]}
-            >
-              <Space.Compact style={{ width: "100%" }}>
-                <Input disabled value={selectedEmployee?.fullName || ""} />
-                <Button type="primary" onClick={() => setOpenEmpModal(true)}>
-                  Chose
-                </Button>
-              </Space.Compact>
-            </Form.Item>
+            {!hideChooseEmp && (
+              <Form.Item
+                label="Employee"
+                required
+                rules={[{ required: true, message: "Employee is required" }]}
+              >
+                <Space.Compact style={{ width: "100%" }}>
+                  <Input disabled value={selectedEmployee?.fullName || ""} />
+                  <Button type="primary" onClick={() => setOpenEmpModal(true)}>
+                    Chose
+                  </Button>
+                </Space.Compact>
+              </Form.Item>
+            )}
             <Form.Item name="employeeId" hidden={true}>
               <Input disabled />
             </Form.Item>
             <AutoFormFields fields={fieldList} />
+
+            {!hideChooseEmp && (
+              <Form.Item name="status" initialValue={"pending"}>
+                <Select>
+                  <Select.Option value="pending">Pending</Select.Option>
+                  <Select.Option value="approved">Approved</Select.Option>
+                  <Select.Option value="rejected">Rejected</Select.Option>
+                </Select>
+              </Form.Item>
+            )}
           </div>
         </Form>
       </Modal>

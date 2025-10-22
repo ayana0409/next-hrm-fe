@@ -7,14 +7,8 @@ import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { message, Pagination, Space, Table } from "antd";
 import { ATTENDANCE_ENDPOINT, ATTENDANCE_FIELDS } from "./attendance.const";
-import CrudTable from "@/components/crud/CrudTable";
 import { PagingResponse } from "@/components/crud/crud-types";
 import { TableProps } from "@/types/table";
-import { useRouter, useSearchParams } from "next/navigation";
-
-interface EmpAttendanceTbProp extends TableProps {
-  employeeId: string;
-}
 
 const columns = fieldsToColumns(fieldsToArray(ATTENDANCE_FIELDS, true));
 const instructs = [
@@ -23,26 +17,25 @@ const instructs = [
   { color: "#72FF6B", label: "Full day" },
 ];
 export default function EmpAttendanceTable({
-  filters: initialFilters,
   employeeId,
-}: EmpAttendanceTbProp) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
+}: {
+  employeeId: string;
+}) {
   const { status } = useSession({ required: true });
   const axiosAuth = useAxiosAuth();
   const [data, setData] = useState<PagingResponse>();
   const [msg, contextHolder] = message.useMessage();
   const dispatch = useDispatch();
-  const [filters, setFilters] = useState<any>(initialFilters || {});
-
-  const [searchValue, setSearchValue] = useState("");
+  const [filters, setFilters] = useState<any>({
+    pageSize: 10,
+    current: 1,
+    id: employeeId,
+  });
 
   const isMounted = useRef(false);
 
   const fetchData = async () => {
     dispatch(startLoading());
-
     await axiosAuth
       .get(
         `${ATTENDANCE_ENDPOINT}/employee/${employeeId}?sort=startDate:desc`,
@@ -53,6 +46,7 @@ export default function EmpAttendanceTable({
       .then((res) => {
         if (!res) return;
         const { items, current, pageSize, pages, totalItem } = res.data.data;
+
         setData({
           items,
           meta: {
@@ -70,7 +64,7 @@ export default function EmpAttendanceTable({
   };
 
   useEffect(() => {
-    if (status === "authenticated") {
+    if (status === "authenticated" && employeeId) {
       if (!isMounted.current) {
         fetchData();
         isMounted.current = true;
@@ -78,13 +72,13 @@ export default function EmpAttendanceTable({
         fetchData();
       }
     }
-  }, [status]);
+  }, [status, filters, employeeId]);
 
   return (
     <>
       {contextHolder}
       <div className="h-max">
-        <div className="pb-4"></div>
+        <div className="pb-2">ATTENDANCE</div>
         <div className="flex-1 overflow-x-auto overflow-y-auto">
           <div className="w-full max-h-[600px] flex flex-col overflow-hidden border rounded shadow">
             {/* Nội dung bảng cuộn */}
@@ -120,10 +114,11 @@ export default function EmpAttendanceTable({
                 pageSizeOptions={["7", "14", "21", "100"]}
                 showSizeChanger
                 onChange={(page, pageSize) => {
-                  const query = new URLSearchParams(searchParams.toString());
-                  query.set("current", String(page));
-                  query.set("pageSize", String(pageSize));
-                  router.push(`?${query.toString()}`);
+                  setFilters((prev: any) => ({
+                    ...prev,
+                    current: page,
+                    pageSize,
+                  }));
                 }}
                 className="flex justify-center"
               />

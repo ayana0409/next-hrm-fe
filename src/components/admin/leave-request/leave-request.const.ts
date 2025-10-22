@@ -36,6 +36,7 @@ export const LEAVE_REQUEST_FIELDS = makeFields({
     inputType: "select",
     options: ["pending", "approved", "rejected"],
     fixed: true,
+    notInput: true,
   },
 } as const);
 

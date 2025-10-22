@@ -38,7 +38,7 @@ const EmpDetailPage = async ({ searchParams }: IProp) => {
           <EmployeeDetail employeeId={id} />
         </div>
         <div>
-          <EmpAttendanceTable employeeId={id} filters={filters} />
+          <EmpAttendanceTable employeeId={id} />
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
