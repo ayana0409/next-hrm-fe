@@ -24,7 +24,13 @@ interface Employee {
   fullName: string;
 }
 
-export default function EmpLeaveRequestTable(initialEmployee: Employee) {
+export default function EmpLeaveRequestTable({
+  initialEmployee,
+  hideAction,
+}: {
+  initialEmployee: Employee;
+  hideAction?: boolean;
+}) {
   const { status } = useSession({ required: true });
   const axiosAuth = useAxiosAuth();
   const [msg, contextHolder] = message.useMessage();
@@ -156,7 +162,7 @@ export default function EmpLeaveRequestTable(initialEmployee: Employee) {
           <Table
             rowKey={(record: any) => record.id || record._id}
             dataSource={data}
-            columns={columnsAction}
+            columns={hideAction ? columns : columnsAction}
             pagination={false}
           />
         </div>
