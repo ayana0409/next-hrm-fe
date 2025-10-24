@@ -8,6 +8,7 @@ import {
   SettingOutlined,
   TeamOutlined,
   BellOutlined,
+  DollarOutlined,
 } from "@ant-design/icons";
 import React, { useContext } from "react";
 import { AdminContext } from "@/library/admin.context";
@@ -66,6 +67,11 @@ const AdminSideBar = () => {
                 <Link href={"/dashboard/leave-request"}>Leave Request</Link>
               ),
               icon: <TeamOutlined />,
+            },
+            {
+              key: "/dashboard/salary",
+              label: <Link href={"/dashboard/salary"}>Salary</Link>,
+              icon: <DollarOutlined />,
             },
           ],
         },
