@@ -6,6 +6,9 @@ import { EMPLOYEE_ROUTE } from "../admin/employee/employee.const";
 import { useSession } from "next-auth/react";
 import EmpLeaveRequestTable from "../admin/employee/emp-leave-request.table";
 import EmpAttendanceTable from "../admin/attendance/emp-attendance.table";
+import { CreditCardOutlined, PoweroffOutlined } from "@ant-design/icons";
+import { Tabs, TabsProps } from "antd";
+import EmpSalaryTable from "../admin/salary/emp-salary.table";
 
 interface Employee {
   id: string;
@@ -43,6 +46,35 @@ export default function EmployeeInfo() {
   useEffect(() => {
     if (status === "authenticated") fetchData();
   }, [status]);
+
+  const tabItems: TabsProps["items"] = [
+    {
+      key: "1",
+      label: "Leave request",
+      children: employee?.id && (
+        <EmpLeaveRequestTable
+          initialEmployee={{
+            fullName: employee.fullName,
+            id: employee.id,
+          }}
+          hideAction={true}
+          hideChooseEmp={true}
+        />
+      ),
+      icon: <PoweroffOutlined />,
+    },
+    {
+      key: "2",
+      label: "Salary",
+      children: employee?.id && <EmpSalaryTable employeeId={employee.id} />,
+      icon: <CreditCardOutlined />,
+    },
+    {
+      key: "3",
+      label: "Tab 3",
+      children: "Content of Tab Pane 3",
+    },
+  ];
 
   return (
     <div className="p-4">
@@ -121,17 +153,8 @@ export default function EmployeeInfo() {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="col-span-2">
-          {employee?.id && (
-            <EmpLeaveRequestTable
-              initialEmployee={{
-                fullName: employee.fullName,
-                id: employee.id,
-              }}
-              hideAction={true}
-              hideChooseEmp={true}
-            />
-          )}
+        <div className="col-span-3">
+          <Tabs defaultActiveKey="1" items={tabItems} />
         </div>
       </div>
     </div>

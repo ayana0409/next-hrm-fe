@@ -1,7 +1,6 @@
 "use client";
 import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useAxiosAuth } from "@/utils/customHook";
-import { fieldsToColumns, fieldsToArray } from "@/utils/fields";
 import { useSession } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
