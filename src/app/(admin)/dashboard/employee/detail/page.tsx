@@ -1,6 +1,9 @@
 import EmpAttendanceTable from "@/components/admin/attendance/emp-attendance.table";
 import EmployeeDetail from "@/components/admin/employee/emp-detail";
 import EmpLeaveRequestTable from "@/components/admin/employee/emp-leave-request.table";
+import { Tabs, TabsProps } from "antd";
+import { CreditCardOutlined, PoweroffOutlined } from "@ant-design/icons";
+import EmpSalaryTable from "@/components/admin/salary/emp-salary.table";
 
 interface IProp {
   searchParams: Promise<{
@@ -28,6 +31,33 @@ const EmpDetailPage = async ({ searchParams }: IProp) => {
     ? query.fullName[0]
     : query.fullName ?? "";
 
+  const tabItems: TabsProps["items"] = [
+    {
+      key: "1",
+      label: "Leave request",
+      children: (
+        <EmpLeaveRequestTable
+          initialEmployee={{
+            fullName,
+            id,
+          }}
+        />
+      ),
+      icon: <PoweroffOutlined />,
+    },
+    {
+      key: "2",
+      label: "Salary",
+      children: <EmpSalaryTable employeeId={id} />,
+      icon: <CreditCardOutlined />,
+    },
+    {
+      key: "3",
+      label: "Tab 3",
+      children: "Content of Tab Pane 3",
+    },
+  ];
+
   return (
     <div>
       <div className="text-3xl font-bold text-blue-950 p-4 text-center uppercase">
@@ -42,13 +72,8 @@ const EmpDetailPage = async ({ searchParams }: IProp) => {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="col-span-2">
-          <EmpLeaveRequestTable
-            initialEmployee={{
-              fullName,
-              id,
-            }}
-          />
+        <div className="col-span-3">
+          <Tabs defaultActiveKey="1" items={tabItems} />
         </div>
       </div>
     </div>
