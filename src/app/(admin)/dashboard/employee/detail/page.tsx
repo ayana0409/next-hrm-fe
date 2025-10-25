@@ -4,6 +4,7 @@ import EmpLeaveRequestTable from "@/components/admin/employee/emp-leave-request.
 import { Tabs, TabsProps } from "antd";
 import { CreditCardOutlined, PoweroffOutlined } from "@ant-design/icons";
 import EmpSalaryTable from "@/components/admin/salary/emp-salary.table";
+import { AttendanceChart } from "@/components/admin/attendance/attendance.chart";
 
 interface IProp {
   searchParams: Promise<{
@@ -53,8 +54,8 @@ const EmpDetailPage = async ({ searchParams }: IProp) => {
     },
     {
       key: "3",
-      label: "Tab 3",
-      children: "Content of Tab Pane 3",
+      label: "Chart",
+      children: <AttendanceChart employeeId={id} />,
     },
   ];
 
