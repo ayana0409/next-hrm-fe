@@ -20,8 +20,8 @@ export function getSixMonthRangeDayjs(): {
   start: dayjs.Dayjs;
   end: dayjs.Dayjs;
 } {
-  const end = dayjs().subtract(1, "month");
-  const start = dayjs().subtract(6, "month");
+  const end = dayjs().subtract(0, "month");
+  const start = dayjs().subtract(5, "month");
 
   return { start, end };
 }
