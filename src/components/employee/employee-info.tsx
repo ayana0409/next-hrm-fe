@@ -6,9 +6,14 @@ import { EMPLOYEE_ROUTE } from "../admin/employee/employee.const";
 import { useSession } from "next-auth/react";
 import EmpLeaveRequestTable from "../admin/employee/emp-leave-request.table";
 import EmpAttendanceTable from "../admin/attendance/emp-attendance.table";
-import { CreditCardOutlined, PoweroffOutlined } from "@ant-design/icons";
+import {
+  BarChartOutlined,
+  CreditCardOutlined,
+  PoweroffOutlined,
+} from "@ant-design/icons";
 import { Tabs, TabsProps } from "antd";
 import EmpSalaryTable from "../admin/salary/emp-salary.table";
+import { AttendanceChart } from "../admin/attendance/attendance.chart";
 
 interface Employee {
   id: string;
@@ -71,8 +76,9 @@ export default function EmployeeInfo() {
     },
     {
       key: "3",
-      label: "Tab 3",
-      children: "Content of Tab Pane 3",
+      label: "Chart",
+      children: employee?.id && <AttendanceChart employeeId={employee.id} />,
+      icon: <BarChartOutlined />,
     },
   ];
 

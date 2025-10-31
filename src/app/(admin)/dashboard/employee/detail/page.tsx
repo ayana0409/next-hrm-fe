@@ -2,7 +2,11 @@ import EmpAttendanceTable from "@/components/admin/attendance/emp-attendance.tab
 import EmployeeDetail from "@/components/admin/employee/emp-detail";
 import EmpLeaveRequestTable from "@/components/admin/employee/emp-leave-request.table";
 import { Tabs, TabsProps } from "antd";
-import { CreditCardOutlined, PoweroffOutlined } from "@ant-design/icons";
+import {
+  BarChartOutlined,
+  CreditCardOutlined,
+  PoweroffOutlined,
+} from "@ant-design/icons";
 import EmpSalaryTable from "@/components/admin/salary/emp-salary.table";
 import { AttendanceChart } from "@/components/admin/attendance/attendance.chart";
 
@@ -56,6 +60,7 @@ const EmpDetailPage = async ({ searchParams }: IProp) => {
       key: "3",
       label: "Chart",
       children: <AttendanceChart employeeId={id} />,
+      icon: <BarChartOutlined />,
     },
   ];
 
