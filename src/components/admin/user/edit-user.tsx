@@ -29,15 +29,14 @@ export default function EditUserButton({
   const [selectedEmployee, setSelectedEmployee] = useState<{
     id: string;
     fullName: string;
-  }>(record.employee);
-
+  }>({ id: record.employee.id, fullName: record.employee.fullName });
   const [form] = Form.useForm();
   const [msg, contextHolder] = message.useMessage();
   const dispatch = useDispatch();
   const axiosAuth = useAxiosAuth();
-
   const onSubmit = async () => {
     const values = await form.validateFields();
+
     dispatch(startLoading());
     axiosAuth
       .patch(`${USER_ENDPOINT}/${record._id}`, values)
@@ -60,7 +59,11 @@ export default function EditUserButton({
   };
 
   useEffect(() => {
-    if (selectedEmployee?.id) {
+    if (
+      selectedEmployee?.id &&
+      form.getFieldInstance &&
+      form.getFieldInstance("employeeId")
+    ) {
       form.setFieldsValue({
         employeeId: selectedEmployee.id,
       });
@@ -74,6 +77,9 @@ export default function EditUserButton({
         <button
           onClick={() => {
             form.setFieldsValue(record);
+            form.setFieldsValue({
+              employeeId: record.employee.id,
+            });
             setOpen(true);
           }}
           aria-label="Edit"
@@ -101,7 +107,7 @@ export default function EditUserButton({
             </Space.Compact>
           </Form.Item>
           <Form.Item name="employeeId" hidden={true}>
-            <Input disabled />
+            <Input disabled value={selectedEmployee.id} />
           </Form.Item>
           <Form.Item name="role" label="Role">
             <Select

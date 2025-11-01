@@ -5,7 +5,6 @@ import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useDispatch } from "react-redux";
 import { useAxiosAuth } from "@/utils/customHook";
 import { LockOutlined } from "@ant-design/icons";
-import { EMPLOYEE_ROUTE } from "../employee/employee.const";
 import { USER_ENDPOINT } from "./user.const";
 
 export default function UserChangePasswordButton({
@@ -42,7 +41,6 @@ export default function UserChangePasswordButton({
   };
 
   const handleReset = () => {
-    console.log("reset password");
     axiosAuth
       .patch(`${USER_ENDPOINT}/${userId}/reset-password`)
       .then(() => {
@@ -73,6 +71,7 @@ export default function UserChangePasswordButton({
         open={open}
         footer={[
           <Popconfirm
+            key={userId}
             title="Reset the password"
             description="Are you sure to reset this password?"
             onConfirm={handleReset}
