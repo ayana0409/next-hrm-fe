@@ -1,7 +1,7 @@
 "use client";
 import CrudTable from "../../crud/CrudTable";
 import { PagingResponse } from "../../crud/crud-types";
-import { TableProps } from "@/types/table";
+import { TableProps } from "@/types/common/table";
 import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useAxiosAuth } from "@/utils/customHook";
 import { fieldsToColumns, fieldsToArray } from "@/utils/fields";

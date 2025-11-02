@@ -4,7 +4,7 @@ import { PagingResponse } from "../../crud/crud-types";
 import DeleteDepartmentButton from "./delete-department";
 import EditDepartmentButton from "./edit-department";
 import CreateDepartmentButton from "./create-department";
-import { TableProps } from "@/types/table";
+import { TableProps } from "@/types/common/table";
 import { useAxiosAuth } from "@/utils/customHook";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";

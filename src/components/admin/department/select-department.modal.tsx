@@ -1,18 +1,12 @@
 import SelectModal, {
-  SelectModalProps,
+  SelectModalPropsGeneric,
 } from "@/components/modal/selected-modal";
 import { DEPARTMENT_ENDPOINT } from "./department.const";
+import { SelectedDepartment } from "@/types/department";
 
-interface Department {
-  id: string;
-  name: string;
-}
-
-export const DepartmentSelectModal: React.FC<SelectModalProps<Department>> = ({
-  visible,
-  onCancel,
-  onSelect,
-}) => {
+export const DepartmentSelectModal: React.FC<
+  SelectModalPropsGeneric<SelectedDepartment>
+> = ({ visible, onCancel, onSelect }) => {
   // Table columns
   const columns = [
     {
@@ -23,7 +17,7 @@ export const DepartmentSelectModal: React.FC<SelectModalProps<Department>> = ({
   ];
 
   return (
-    <SelectModal<Department>
+    <SelectModal<SelectedDepartment>
       visible={visible}
       onCancel={onCancel}
       onSelect={onSelect}

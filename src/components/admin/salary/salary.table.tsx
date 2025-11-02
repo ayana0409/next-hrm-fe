@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { message, Pagination, Space, Table } from "antd";
 import { PagingResponse } from "@/components/crud/crud-types";
-import { TableProps } from "@/types/table";
+import { TableProps } from "@/types/common/table";
 import { SALARY_ENDPOINT, SALARY_FIELDS } from "./salary.const";
 import Title from "antd/es/typography/Title";
 import GenerateSalaryButton from "./generate-salary";

@@ -1,19 +1,9 @@
 import MultiSelectModal from "@/components/modal/muti-select-modal";
 import { POSITION_ENDPOINT } from "./position.const";
+import { SelectedPosition } from "@/types/position";
+import { SelectModalProps } from "@/components/modal/selected-modal";
 
-interface Position {
-  id: string;
-  title: string;
-  level: string;
-}
-
-interface SelectModalProps<T> {
-  visible: boolean;
-  onCancel: () => void;
-  onSelect: (selected: string[]) => void;
-}
-
-const PositionMutiSelectModal: React.FC<SelectModalProps<Position>> = ({
+const PositionMutiSelectModal: React.FC<SelectModalProps> = ({
   visible,
   onCancel,
   onSelect,
@@ -33,7 +23,7 @@ const PositionMutiSelectModal: React.FC<SelectModalProps<Position>> = ({
   ];
 
   return (
-    <MultiSelectModal<Position>
+    <MultiSelectModal<SelectedPosition>
       visible={visible}
       onCancel={onCancel}
       onSelect={onSelect}

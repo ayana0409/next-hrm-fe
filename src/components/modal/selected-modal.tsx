@@ -8,10 +8,16 @@ import { ColumnType } from "antd/es/table";
 import { useAxiosAuth } from "@/utils/customHook";
 import { PagingResponse } from "../crud/crud-types";
 
-export interface SelectModalProps<T> {
+export interface SelectModalPropsGeneric<T> {
   visible: boolean;
   onCancel: () => void;
   onSelect: (selected: T) => void;
+}
+
+export interface SelectModalProps {
+  visible: boolean;
+  onCancel: () => void;
+  onSelect: (selected: string[]) => void;
 }
 
 interface BaseSelectModalProps<T> {

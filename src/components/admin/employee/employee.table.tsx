@@ -1,7 +1,7 @@
 "use client";
 import CrudTable from "../../crud/CrudTable";
 import { PagingResponse } from "../../crud/crud-types";
-import { TableProps } from "@/types/table";
+import { TableProps } from "@/types/common/table";
 import { useAxiosAuth } from "@/utils/customHook";
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";

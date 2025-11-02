@@ -1,4 +1,4 @@
-import { FieldDef } from "@/types/table";
+import { FieldDef } from "@/types/common/table";
 import { ColumnsType } from "antd/es/table";
 
 export function makeFields<T extends Record<string, FieldDef>>(obj: T): T {

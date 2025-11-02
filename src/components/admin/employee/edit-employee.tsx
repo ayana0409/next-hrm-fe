@@ -1,5 +1,14 @@
 "use client";
-import { Button, Form, Input, Modal, Space, Tooltip, message } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Space,
+  Tooltip,
+  message,
+} from "antd";
 import { useEffect, useState } from "react";
 import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useDispatch } from "react-redux";
@@ -10,6 +19,8 @@ import { EditFilled } from "@ant-design/icons";
 import { EMPLOYEE_FIELDS, EMPLOYEE_ROUTE } from "./employee.const";
 import { DepartmentSelectModal } from "../department/select-department.modal";
 import { PositionSelectModal } from "../position/select-position.modal";
+import { SelectedPosition } from "@/types/position";
+import { SelectedDepartment } from "@/types/department";
 
 export default function EditEmployeeButton({
   record,
@@ -19,21 +30,15 @@ export default function EditEmployeeButton({
   onUpdated: () => void;
 }) {
   const [openDepModal, setOpenDepModal] = useState(false);
-  const [selectedDepartment, setSelectedDepartment] = useState<{
-    _id?: string;
-    name?: string;
-  }>({
-    _id: record?.department?._id || record?.department?.id || "",
-    name: record?.department?.name || "",
-  });
+  const [selectedDepartment, setSelectedDepartment] =
+    useState<SelectedDepartment>({
+      id: record?.department?._id || record?.department?.id || "",
+      name: record?.department?.name || "",
+    });
 
   const [openPosModal, setOpenPosModal] = useState(false);
-  const [selectedPosition, setSelectedPosition] = useState<{
-    _id?: string;
-    title?: string;
-    level?: string;
-  }>({
-    _id: record?.position?._id || record?.position?.id || "",
+  const [selectedPosition, setSelectedPosition] = useState<SelectedPosition>({
+    id: record?.position?._id || record?.position?.id || "",
     title: record?.position?.title || "",
     level: record?.position?.level || "",
   });
@@ -63,29 +68,29 @@ export default function EditEmployeeButton({
   };
 
   // Selecting Department
-  const handleSelectDep = (department: any) => {
+  const handleSelectDep = (department: SelectedDepartment) => {
     setSelectedDepartment(department);
     setOpenDepModal(false);
   };
 
   useEffect(() => {
-    if (selectedDepartment?._id) {
+    if (selectedDepartment?.id && form.getFieldInstance("departmentId")) {
       form.setFieldsValue({
-        departmentId: selectedDepartment._id,
+        departmentId: selectedDepartment.id,
       });
     }
   }, [selectedDepartment]);
 
   // Selecting Postion
-  const handleSelectPos = (position: any) => {
+  const handleSelectPos = (position: SelectedPosition) => {
     setSelectedPosition(position);
     setOpenPosModal(false);
   };
 
   useEffect(() => {
-    if (selectedPosition._id) {
+    if (selectedPosition.id && form.getFieldInstance("positionId")) {
       form.setFieldsValue({
-        positionId: selectedPosition._id,
+        positionId: selectedPosition.id,
       });
     }
   }, [selectedPosition]);
@@ -118,7 +123,14 @@ export default function EditEmployeeButton({
           xxl: "60%",
         }}
       >
-        <Form form={form} layout="vertical">
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{
+            positionId: selectedPosition?.id,
+            departmentId: selectedDepartment.id,
+          }}
+        >
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <AutoFormFields fields={fieldList} />
 
@@ -186,6 +198,15 @@ export default function EditEmployeeButton({
                   />
                 </>
               )}
+            </Form.Item>
+            <Form.Item name="status" label="Status">
+              <Select
+                options={[
+                  { label: "Active", value: "active" },
+                  { label: "Inactive", value: "inactive" },
+                  { label: "Terminated", value: "terminated" },
+                ]}
+              />
             </Form.Item>
           </div>
         </Form>

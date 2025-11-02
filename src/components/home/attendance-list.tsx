@@ -19,7 +19,7 @@ import {
 import { PagingResponse } from "../crud/crud-types";
 import Title from "antd/es/typography/Title";
 import { SyncOutlined } from "@ant-design/icons";
-import { TableProps } from "@/types/table";
+import { TableProps } from "@/types/common/table";
 
 const columns = fieldsToColumns(fieldsToArray(ATTENDANCE_FIELDS, true));
 

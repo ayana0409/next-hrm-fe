@@ -1,7 +1,7 @@
 "use client"; // Nếu dùng App Router
 import Title from "antd/es/typography/Title";
 import React, { useRef } from "react";
-import { TableProps } from "@/types/table";
+import { TableProps } from "@/types/common/table";
 import FaceAttendance from "../home/face-attendance";
 import AttendanceList, { AttendanceListRef } from "../home/attendance-list";
 

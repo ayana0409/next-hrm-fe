@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 import { message, Pagination, Space, Table } from "antd";
 import { ATTENDANCE_ENDPOINT, ATTENDANCE_FIELDS } from "./attendance.const";
 import { PagingResponse } from "@/components/crud/crud-types";
-import { TableProps } from "@/types/table";
+import { TableProps } from "@/types/common/table";
 
 const columns = fieldsToColumns(fieldsToArray(ATTENDANCE_FIELDS, true));
 const instructs = [

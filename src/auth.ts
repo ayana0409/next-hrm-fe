@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import api from "./utils/api";
-import { IUser } from "./types/next-auth";
+import { IUser } from "./types/common/next-auth";
 import { jwtDecode } from "jwt-decode";
 import { JWT } from "next-auth/jwt";
 

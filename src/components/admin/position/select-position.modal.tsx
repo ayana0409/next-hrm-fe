@@ -1,19 +1,12 @@
 import SelectModal, {
-  SelectModalProps,
+  SelectModalPropsGeneric,
 } from "@/components/modal/selected-modal";
 import { POSITION_ENDPOINT } from "./position.const";
+import { SelectedPosition } from "@/types/position";
 
-interface Position {
-  id: string;
-  title: string;
-  level: string;
-}
-
-export const PositionSelectModal: React.FC<SelectModalProps<Position>> = ({
-  visible,
-  onCancel,
-  onSelect,
-}) => {
+export const PositionSelectModal: React.FC<
+  SelectModalPropsGeneric<SelectedPosition>
+> = ({ visible, onCancel, onSelect }) => {
   // Table columns
   const columns = [
     {
@@ -29,7 +22,7 @@ export const PositionSelectModal: React.FC<SelectModalProps<Position>> = ({
   ];
 
   return (
-    <SelectModal<Position>
+    <SelectModal<SelectedPosition>
       visible={visible}
       onCancel={onCancel}
       onSelect={onSelect}

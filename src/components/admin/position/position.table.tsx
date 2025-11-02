@@ -1,5 +1,5 @@
 "use client";
-import { TableProps } from "@/types/table";
+import { TableProps } from "@/types/common/table";
 import CrudTable from "../../crud/CrudTable";
 import { PagingResponse } from "../../crud/crud-types";
 import CreatePositionButton from "./create-position";

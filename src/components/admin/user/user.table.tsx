@@ -4,7 +4,7 @@ import CreateUserButton from "./create-user";
 import EditUserButton from "./edit-user";
 import DeleteUserButton from "./delete-user";
 import { PagingResponse } from "../../crud/crud-types";
-import { TableProps } from "@/types/table";
+import { TableProps } from "@/types/common/table";
 import { USER_ENDPOINT, USER_FIELDS } from "./user.const";
 import { startLoading, stopLoading } from "@/store/loading-slice";
 import { useAxiosAuth } from "@/utils/customHook";

@@ -1,4 +1,4 @@
-import { FieldDef } from "@/types/table";
+import { FieldDef } from "@/types/common/table";
 import { Checkbox, DatePicker, Form, Input, InputNumber, Select } from "antd";
 
 export function AutoFormFields({ fields }: { fields: FieldDef[] }) {

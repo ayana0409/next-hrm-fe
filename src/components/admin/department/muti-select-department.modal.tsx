@@ -1,19 +1,9 @@
 import MultiSelectModal from "@/components/modal/muti-select-modal";
 import { DEPARTMENT_ENDPOINT } from "./department.const";
-import SelectModal from "@/components/modal/selected-modal";
+import { SelectedDepartment } from "@/types/department";
+import { SelectModalProps } from "@/components/modal/selected-modal";
 
-interface Department {
-  id: string;
-  name: string;
-}
-
-interface SelectModalProps<T> {
-  visible: boolean;
-  onCancel: () => void;
-  onSelect: (selected: string[]) => void;
-}
-
-const DepartmentMutiSelectModal: React.FC<SelectModalProps<Department>> = ({
+const DepartmentMutiSelectModal: React.FC<SelectModalProps> = ({
   visible,
   onCancel,
   onSelect,
@@ -28,7 +18,7 @@ const DepartmentMutiSelectModal: React.FC<SelectModalProps<Department>> = ({
   ];
 
   return (
-    <MultiSelectModal<Department>
+    <MultiSelectModal<SelectedDepartment>
       visible={visible}
       onCancel={onCancel}
       onSelect={onSelect}
