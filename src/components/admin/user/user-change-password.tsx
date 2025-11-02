@@ -9,8 +9,10 @@ import { USER_ENDPOINT } from "./user.const";
 
 export default function UserChangePasswordButton({
   userId,
+  canReset,
 }: {
   userId: string;
+  canReset?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [msg, contextHolder] = message.useMessage();
@@ -70,23 +72,27 @@ export default function UserChangePasswordButton({
         title="Change Password"
         open={open}
         footer={[
-          <Popconfirm
-            key={userId}
-            title="Reset the password"
-            description="Are you sure to reset this password?"
-            onConfirm={handleReset}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button
-              key="reset"
-              color="danger"
-              variant="solid"
-              className="float-left"
+          canReset ? (
+            <Popconfirm
+              key={userId}
+              title="Reset the password"
+              description="Are you sure to reset this password?"
+              onConfirm={handleReset}
+              okText="Yes"
+              cancelText="No"
             >
-              Reset Password
-            </Button>
-          </Popconfirm>,
+              <Button
+                key="reset"
+                color="danger"
+                variant="solid"
+                className="float-left"
+              >
+                Reset Password
+              </Button>
+            </Popconfirm>
+          ) : (
+            <></>
+          ),
           <Button key="cancel" onClick={() => setOpen(false)}>
             Cancel
           </Button>,

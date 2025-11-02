@@ -127,7 +127,7 @@ export default function UserTable({ filters: initialFilters }: TableProps) {
         actions={(record) => (
           <Space>
             <EditUserButton onUpdated={fetchData} record={record} />
-            <UserChangePasswordButton userId={record._id} />
+            <UserChangePasswordButton userId={record._id} canReset={true} />
             <DeleteUserButton onDeleted={fetchData} id={record._id} />
           </Space>
         )}

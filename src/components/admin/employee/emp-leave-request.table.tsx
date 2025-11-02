@@ -5,8 +5,14 @@ import { fieldsToColumns, fieldsToArray } from "@/utils/fields";
 import { useSession } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { Input, message, Space, Table, Tooltip } from "antd";
-import { SyncOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { message, Space, Table, Tag, Tooltip } from "antd";
+import {
+  CheckOutlined,
+  CloseOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  ClockCircleOutlined,
+} from "@ant-design/icons";
 import CreateLeaveRequestButton from "../leave-request/create-leave-request";
 import EditLeaveRequestButton from "../leave-request/edit-leave-request";
 import {
@@ -15,7 +21,6 @@ import {
   LeaveRequestStatusEnum,
 } from "../leave-request/leave-request.const";
 import dayjs from "dayjs";
-import EmpAttendanceTable from "../attendance/emp-attendance.table";
 
 const columns = fieldsToColumns(fieldsToArray(LEAVE_REQUEST_FIELDS, true));
 
@@ -44,8 +49,44 @@ export default function EmpLeaveRequestTable({
 
   const isMounted = useRef(false);
 
+  const customColumn = [
+    ...columns.filter((col) => col.key !== "status"),
+    {
+      title: "Status",
+      key: "status",
+      render: (_: any, record: any) => (
+        <>
+          {record.status != LeaveRequestStatusEnum.Pending || (
+            <Tooltip title={LeaveRequestStatusEnum.Pending}>
+              <ClockCircleOutlined
+                className="text-xl"
+                style={{ color: "#4395c4" }}
+              />
+            </Tooltip>
+          )}
+          {record.status != LeaveRequestStatusEnum.Approved || (
+            <Tooltip title={LeaveRequestStatusEnum.Approved}>
+              <CheckCircleOutlined
+                className="text-xl"
+                style={{ color: "#52c41a" }}
+              />
+            </Tooltip>
+          )}
+          {record.status != LeaveRequestStatusEnum.Rejected || (
+            <Tooltip title={LeaveRequestStatusEnum.Rejected}>
+              <CloseCircleOutlined
+                className="text-xl"
+                style={{ color: "#ba0202" }}
+              />
+            </Tooltip>
+          )}
+        </>
+      ),
+    },
+  ];
+
   const columnsAction = [
-    ...columns,
+    ...customColumn,
     {
       title: "Actions",
       key: "actions",
@@ -150,7 +191,7 @@ export default function EmpLeaveRequestTable({
           <Table
             rowKey={(record: any) => record.id || record._id}
             dataSource={data}
-            columns={hideAction ? columns : columnsAction}
+            columns={hideAction ? customColumn : columnsAction}
             pagination={false}
           />
         </div>
