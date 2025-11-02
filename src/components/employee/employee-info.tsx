@@ -26,6 +26,7 @@ import {
 import { Divider, Space, Tabs, TabsProps, Tag } from "antd";
 import EmpSalaryTable from "../admin/salary/emp-salary.table";
 import { AttendanceChart } from "../admin/attendance/attendance.chart";
+import UserChangePasswordButton from "../admin/user/user-change-password";
 
 interface Employee {
   id: string;
@@ -231,6 +232,13 @@ export default function EmployeeInfo() {
                   </div>
                 </div>
               </div>
+              {(session?.user as any).id && (
+                <div className="flex">
+                  <UserChangePasswordButton
+                    userId={(session?.user as any).id}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
