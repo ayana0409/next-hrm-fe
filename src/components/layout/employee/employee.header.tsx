@@ -1,9 +1,6 @@
 "use client";
-import { AdminContext } from "@/library/admin.context";
-import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import { Button, Layout } from "antd";
-import { useContext } from "react";
-import { DownOutlined, SmileOutlined } from "@ant-design/icons";
+import { Layout } from "antd";
+import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
 import { signOut, useSession } from "next-auth/react";
@@ -17,7 +14,6 @@ const EmployeeHeader = () => {
       key: "1",
       label: <a href="/">Home</a>,
     },
-
     {
       key: "2",
       disabled:
