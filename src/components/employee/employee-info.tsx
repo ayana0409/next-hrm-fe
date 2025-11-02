@@ -232,7 +232,7 @@ export default function EmployeeInfo() {
                   </div>
                 </div>
               </div>
-              {(session?.user as any).id && (
+              {status === "authenticated" && (session?.user as any).id && (
                 <div className="flex">
                   <UserChangePasswordButton
                     userId={(session?.user as any).id}
