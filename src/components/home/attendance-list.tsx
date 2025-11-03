@@ -61,7 +61,7 @@ const AttendanceList = forwardRef<AttendanceListRef, TableProps>(
         .get(ATTENDANCE_ENDPOINT + "/today", { params: filters })
         .then((res) => {
           if (!res) return;
-          console.log("Attendance data fetched:", res.data);
+
           const { items, current, pageSize, pages, totalItem } = res.data;
 
           setData({
