@@ -86,7 +86,7 @@ const NotificationModal: React.FC = () => {
     if (status === "authenticated") fetchData();
   }, [status, filters]);
 
-  useNotificationSocket((session?.user as any).id, (message) => {
+  useNotificationSocket((session?.user as any)?.id ?? undefined, (message) => {
     msg.info(message, 3);
     fetchData();
   });

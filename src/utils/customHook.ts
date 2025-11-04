@@ -115,12 +115,14 @@ export const useRefreshToken = () => {
 
 const SOCKET_URL = "http://localhost:8080";
 export function useNotificationSocket(
-  userId: string,
+  userId: string | undefined,
   onMessage: (msg: string) => void
 ) {
   const socketRef = useRef<ClientSocket | null>(null);
 
   useEffect(() => {
+    if (!userId) return;
+
     // connect socket
     const socket = io(SOCKET_URL, {
       transports: ["websocket"],
