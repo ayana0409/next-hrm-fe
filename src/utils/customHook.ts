@@ -1,8 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import api, { axiosAuth } from "./api";
+import { io, Socket as ClientSocket } from "socket.io-client";
 
 export const useHasMounted = () => {
   const [hasMounted, setHasMounted] = useState<boolean>(false);
@@ -111,3 +112,41 @@ export const useRefreshToken = () => {
 
   return refreshToken;
 };
+
+const SOCKET_URL = "http://localhost:8080";
+export function useNotificationSocket(
+  userId: string,
+  onMessage: (msg: string) => void
+) {
+  const socketRef = useRef<ClientSocket | null>(null);
+
+  useEffect(() => {
+    // connect socket
+    const socket = io(SOCKET_URL, {
+      transports: ["websocket"],
+    });
+    socketRef.current = socket;
+
+    // connect success => send userId to sub
+    socket.on("connect", () => {
+      socket.emit("register", userId);
+    });
+
+    // listening event notification
+    socket.on("notification", (data) => {
+      onMessage(data.message);
+    });
+
+    // disconnect
+    socket.on("disconnect", () => {
+      console.log("Disconnected from socket server");
+    });
+
+    // Cleanup when unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, [userId, onMessage]);
+
+  return socketRef;
+}
