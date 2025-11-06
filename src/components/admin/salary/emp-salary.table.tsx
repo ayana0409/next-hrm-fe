@@ -7,6 +7,8 @@ import { useDispatch } from "react-redux";
 import { Pagination, Table } from "antd";
 import { PagingResponse } from "@/components/crud/crud-types";
 import { SALARY_ENDPOINT } from "./salary.const";
+import { Salary } from "@/types/salary";
+import ExportSalary from "./export-salary";
 
 const columns = [
   {
@@ -33,6 +35,12 @@ const columns = [
     title: "Net",
     key: "netSalary",
     dataIndex: "netSalary",
+  },
+  {
+    title: "Action",
+    key: "action",
+    dataIndex: "action",
+    width: 50,
   },
 ];
 
@@ -62,7 +70,10 @@ export default function EmpSalaryTable({ employeeId }: { employeeId: string }) {
         if (!res) return;
         const { items, current, pageSize, pages, totalItem } = res.data.data;
         setData({
-          items,
+          items: items.map((item: Salary) => ({
+            ...item,
+            action: <ExportSalary data={item} />,
+          })),
           meta: {
             current,
             pageSize,
