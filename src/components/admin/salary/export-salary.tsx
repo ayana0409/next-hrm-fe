@@ -55,8 +55,18 @@ export default function ExportSalary({ data }: { data: Salary }) {
           table: {
             widths: ["60%", "40%"],
             body: [
-              ["Late penalty (VND/minute)", data.latePenaltyPerMinute],
-              ["Absence penalty (VND/day)", data.absencePenaltyPerDate],
+              [
+                "Late penalty (VND/minute)",
+                new Intl.NumberFormat("vi-VN").format(
+                  data.latePenaltyPerMinute
+                ),
+              ],
+              [
+                "Absence penalty (VND/day)",
+                new Intl.NumberFormat("vi-VN").format(
+                  data.absencePenaltyPerDate
+                ),
+              ],
               ["Over time rate", data.overTimeRate],
             ],
           },
@@ -70,12 +80,26 @@ export default function ExportSalary({ data }: { data: Salary }) {
           table: {
             widths: ["50%", "50%"],
             body: [
-              ["Base salary", `${data.baseSalary.toLocaleString()} VND`],
-              ["Bonus", `${data.bonus.toLocaleString()} VND`],
-              ["Deduction", `${data.deductions.toLocaleString()} VND`],
+              [
+                "Base salary",
+                `${new Intl.NumberFormat("vi-VN").format(data.baseSalary)} VND`,
+              ],
+              [
+                "Bonus",
+                `${new Intl.NumberFormat("vi-VN").format(data.bonus)} VND`,
+              ],
+              [
+                "Deduction",
+                `${new Intl.NumberFormat("vi-VN").format(data.deductions)} VND`,
+              ],
               [
                 { text: "NET", bold: true },
-                { text: `${data.netSalary.toLocaleString()} VND`, bold: true },
+                {
+                  text: `${new Intl.NumberFormat("vi-VN").format(
+                    data.netSalary
+                  )} VND`,
+                  bold: true,
+                },
               ],
             ],
           },

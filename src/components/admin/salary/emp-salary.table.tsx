@@ -20,21 +20,25 @@ const columns = [
     title: "Base salary",
     key: "baseSalary",
     dataIndex: "baseSalary",
+    render: (value: number) => new Intl.NumberFormat("vi-VN").format(value),
   },
   {
     title: "Bonus",
     key: "bonus",
     dataIndex: "bonus",
+    render: (value: number) => new Intl.NumberFormat("vi-VN").format(value),
   },
   {
     title: "Deductions",
     key: "deductions",
     dataIndex: "deductions",
+    render: (value: number) => new Intl.NumberFormat("vi-VN").format(value),
   },
   {
     title: "Net",
     key: "netSalary",
     dataIndex: "netSalary",
+    render: (value: number) => new Intl.NumberFormat("vi-VN").format(value),
   },
   {
     title: "Action",
@@ -69,6 +73,7 @@ export default function EmpSalaryTable({ employeeId }: { employeeId: string }) {
       .then((res) => {
         if (!res) return;
         const { items, current, pageSize, pages, totalItem } = res.data.data;
+        console.log(items);
         setData({
           items: items.map((item: Salary) => ({
             ...item,
