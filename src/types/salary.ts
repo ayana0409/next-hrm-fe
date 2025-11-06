@@ -13,4 +13,7 @@ export interface Salary {
   lateMinutes: number;
   oTHours: number;
   offDates: number;
+  latePenaltyPerMinute: number;
+  absencePenaltyPerDate: number;
+  overTimeRate: number;
 }

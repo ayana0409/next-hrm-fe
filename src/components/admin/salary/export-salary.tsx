@@ -16,7 +16,7 @@ export default function ExportSalary({ data }: { data: Salary }) {
       content: [
         { text: `PAY SLIP FOR ${data.month}`, style: "title" },
 
-        // Thông tin nhân viên
+        // Employee info
         { text: "I. Employee infomations", style: "sectionHeader" },
         {
           style: "infoTable",
@@ -32,7 +32,7 @@ export default function ExportSalary({ data }: { data: Salary }) {
           layout: "noBorders",
         },
 
-        // Thông tin chấm công
+        // Attendance
         { text: "II. Attendance details", style: "sectionHeader" },
         {
           style: "attendanceTable",
@@ -46,8 +46,25 @@ export default function ExportSalary({ data }: { data: Salary }) {
             ],
           },
           layout: "lightHorizontalLines",
-        }, // Chi tiết lương
-        { text: "II. Salary details", style: "sectionHeader" },
+        },
+
+        // Regulation
+        { text: "III. Regulations", style: "sectionHeader" },
+        {
+          style: "regulationTable",
+          table: {
+            widths: ["60%", "40%"],
+            body: [
+              ["Late penalty (VND/minute)", data.latePenaltyPerMinute],
+              ["Absence penalty (VND/day)", data.absencePenaltyPerDate],
+              ["Over time rate", data.overTimeRate],
+            ],
+          },
+          layout: "lightHorizontalLines",
+        },
+
+        // Chi tiết lương
+        { text: "IV. Salary details", style: "sectionHeader" },
         {
           style: "salaryTable",
           table: {
