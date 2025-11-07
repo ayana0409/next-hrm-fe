@@ -1,17 +1,16 @@
 // middleware.ts
-import { auth } from "@/auth";
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
 export async function middleware(req: any) {
-  const session = await auth();
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
   const pathname = req.nextUrl.pathname;
 
-  // Nếu không có session (chưa đăng nhập)
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!token) {
+    return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
-  const role = session.user.role;
+  const role = token.user.role;
 
   // Role: admin - Truy cập toàn bộ
   if (role === "admin") {
