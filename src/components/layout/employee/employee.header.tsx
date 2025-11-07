@@ -4,6 +4,7 @@ import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
 import { signOut, useSession } from "next-auth/react";
+import NotificationModal from "@/components/employee/notification";
 
 const EmployeeHeader = () => {
   const { data: session, status } = useSession();
@@ -18,7 +19,7 @@ const EmployeeHeader = () => {
       key: "2",
       disabled:
         session?.user.role && session?.user.role !== "employee" ? false : true,
-      label: <a href={`dashboard`}>Dashboard</a>,
+      label: <a href={`../dashboard`}>Dashboard</a>,
     },
     {
       key: "3",
@@ -60,6 +61,7 @@ const EmployeeHeader = () => {
             </Space>
           </a>
         </Dropdown>
+        <NotificationModal />
       </Header>
     </>
   );

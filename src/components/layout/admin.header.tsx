@@ -7,6 +7,7 @@ import { DownOutlined, SmileOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
 import { signOut, useSession } from "next-auth/react";
+import NotificationModal from "../employee/notification";
 
 const AdminHeader = () => {
   const { data: session, status } = useSession();
@@ -69,6 +70,7 @@ const AdminHeader = () => {
             </Space>
           </a>
         </Dropdown>
+        <NotificationModal />
       </Header>
     </>
   );
