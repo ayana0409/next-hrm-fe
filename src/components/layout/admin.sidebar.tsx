@@ -9,6 +9,7 @@ import {
   TeamOutlined,
   BellOutlined,
   DollarOutlined,
+  ReconciliationOutlined,
 } from "@ant-design/icons";
 import React, { useContext } from "react";
 import { AdminContext } from "@/library/admin.context";
@@ -81,6 +82,11 @@ const AdminSideBar = () => {
             <Link href={"/dashboard/notification"}>Manage Notification</Link>
           ),
           icon: <BellOutlined />,
+        },
+        {
+          key: "/dashboard/audit-log",
+          label: <Link href={"/dashboard/audit-log"}>Log</Link>,
+          icon: <ReconciliationOutlined />,
         },
       ],
     },
