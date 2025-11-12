@@ -7,13 +7,15 @@ import { useAxiosAuth } from "@/utils/customHook";
 import { useSession } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { Button, DatePicker, message, Select, Space, Tooltip } from "antd";
-import { SyncOutlined } from "@ant-design/icons";
+import { Button, Popover, Select, Space, Tooltip } from "antd";
+import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  FileTextOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 import { NOTIFICATION_ENDPOINT } from "./notificaton.const";
-import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import dayjs, { Dayjs } from "dayjs";
 import Title from "antd/es/typography/Title";
-import EmployeeMutiSelectModal from "../employee/muti-select-employee.modal";
 import CreateNotificationButton from "./create-notifitaion";
 import { DepartmentSelectModal } from "../department/select-department.modal";
 import EmployeeSelectModal from "../employee/select-employee.modal";
@@ -25,7 +27,66 @@ const column = [
     key: "message",
     dataIndex: "message",
   },
+  {
+    title: "Send",
+    key: "createdAt",
+    dataIndex: "createdAt",
+  },
+  {
+    title: "Seen",
+    key: "read",
+    dataIndex: "read",
+    render: (value: boolean) => {
+      return value ? (
+        <Tooltip title="Seen">
+          <CheckCircleOutlined
+            className="text-xl"
+            style={{ color: "#52c41a" }}
+          />
+        </Tooltip>
+      ) : (
+        <Tooltip title="Send">
+          <ClockCircleOutlined
+            className="text-xl"
+            style={{ color: "#4395c4" }}
+          />
+        </Tooltip>
+      );
+    },
+  },
 ];
+
+const userColumn = [
+  ...column,
+  {
+    title: "User",
+    key: "username",
+    dataIndex: "username",
+  },
+];
+
+let depPosColumn = [
+  ...column,
+  {
+    title: "Targets",
+    key: "targets",
+    dataIndex: "targets",
+    render: (targets: string[] = []) => (
+      <Tooltip title="Targets">
+        <Popover
+          content={targets.map((value: string, index: number) => (
+            <div key={index}>{value}</div>
+          ))}
+          title="Targets"
+          trigger="click"
+        >
+          <FileTextOutlined className="font-xl" />
+        </Popover>
+      </Tooltip>
+    ),
+  },
+];
+
 export default function NotificationTable({
   filters: initialFilters,
 }: TableProps) {
@@ -50,7 +111,6 @@ export default function NotificationTable({
 
       if (res?.data?.data) {
         const { items, current, pageSize, pages, totalItem } = res.data.data;
-
         setData({
           items,
           meta: { current, pageSize, pages, totalItem },
@@ -62,57 +122,6 @@ export default function NotificationTable({
       dispatch(stopLoading());
     }
   };
-
-  // const updateStatus = async (id: string, status: LeaveRequestStatusEnum) => {
-  //   dispatch(startLoading());
-  //   await axiosAuth
-  //     .patch(`${LEAVE_REQUEST_ENDPOINT}/${id}/status/${status}`)
-  //     .then(() => {
-  //       msg.success(status);
-  //       fetchData();
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //       msg.error(error?.response.data.message || "Failed");
-  //     })
-  //     .finally(() => {
-  //       dispatch(stopLoading());
-  //     });
-  // };
-
-  // const handleDateChange = (values: any) => {
-  //   setSearchDate(values); // [startDate, endDate]if (values && values[0] && values[1]) {
-  //   if (values && values[0] && values[1]) {
-  //     const startDate = values[0].format("YYYY/MM/DD");
-  //     const endDate = values[1].format("YYYY/MM/DD");
-
-  //     setFilters((prev: any) => ({
-  //       ...prev,
-  //       startDate,
-  //       endDate,
-  //     }));
-  //   } else {
-  //     setFilters((prev: any) => {
-  //       const { startDate, endDate, ...rest } = prev;
-  //       return rest;
-  //     });
-  //   }
-  // };
-
-  // const handleStatusChange = (values: any) => {
-  //   setSearchStatus(values);
-  //   if (values) {
-  //     setFilters((prev: any) => ({
-  //       ...prev,
-  //       status: values,
-  //     }));
-  //   } else {
-  //     setFilters((prev: any) => {
-  //       const { status, ...rest } = prev;
-  //       return rest;
-  //     });
-  //   }
-  // };
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -151,11 +160,11 @@ export default function NotificationTable({
               value={filters.read}
               options={[
                 { label: "Seen", value: true },
-                { label: "Un seen", value: false },
+                { label: "Send", value: false },
               ]}
-              onChange={(value) =>
-                setFilters((prev: any) => ({ ...prev, read: value }))
-              }
+              onChange={(value) => {
+                setFilters((prev: any) => ({ ...prev, read: value }));
+              }}
               allowClear
             />
             |
@@ -196,7 +205,7 @@ export default function NotificationTable({
               className="bg-gray-400 text-shadow-neutral-950 hover:bg-gray-600 rounded px-3 py-1 transition shadow-sm"
               onClick={() => {
                 setFilters((prev: any) => {
-                  const { targetType, targetId, read, ...rest } = prev;
+                  const { targetType, targetId, read, userId, ...rest } = prev;
                   return rest;
                 });
               }}
@@ -208,58 +217,23 @@ export default function NotificationTable({
       </div>
 
       <CrudTable
-        columns={column}
+        columns={
+          filters.targetType === "department" ||
+          filters.targetType === "position"
+            ? depPosColumn
+            : userColumn
+        }
         items={data?.items.map((item, index) => ({
           ...item,
           _id: index,
         }))}
         meta={data?.meta}
-        // actions={(record) => (
-        //   <Space>
-        //     {record.status != LeaveRequestStatusEnum.Pending || (
-        //       <EditLeaveRequestButton
-        //         record={{
-        //           ...record,
-        //           startDate: dayjs(record.startDate),
-        //           endDate: dayjs(record.endDate),
-        //         }}
-        //         onUpdated={fetchData}
-        //       />
-        //     )}
-        //     {record.status === LeaveRequestStatusEnum.Approved || (
-        //       <Tooltip title="Approve Request" className="m-2">
-        //         <button
-        //           onClick={() => {
-        //             updateStatus(record.id, LeaveRequestStatusEnum.Approved);
-        //           }}
-        //           aria-label="Approve Request"
-        //           className="bg-green-600 text-white hover:bg-green-800 rounded px-3 py-1 transition shadow-sm"
-        //         >
-        //           <CheckOutlined className="mr-2" />
-        //         </button>
-        //       </Tooltip>
-        //     )}
-        //     {record.status === LeaveRequestStatusEnum.Rejected || (
-        //       <Tooltip title="Reject Request" className="m-2">
-        //         <button
-        //           onClick={() => {
-        //             updateStatus(record.id, LeaveRequestStatusEnum.Rejected);
-        //           }}
-        //           aria-label="Reject Request"
-        //           className="bg-red-600 text-white hover:bg-red-800 rounded px-3 py-1 transition shadow-sm"
-        //         >
-        //           <CloseOutlined className="mr-2" />
-        //         </button>
-        //       </Tooltip>
-        //     )}
-        //   </Space>
-        // )}
       />
       <EmployeeSelectModal
         visible={openEmpModal}
         onCancel={() => setOpenEmpModal(false)}
         onSelect={(value: any) =>
-          setFilters((prev: any) => ({ ...prev, targetId: value }))
+          setFilters((prev: any) => ({ ...prev, userId: value.id }))
         }
       />
       <DepartmentSelectModal

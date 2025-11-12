@@ -12,10 +12,11 @@ import { Button, Input, Popover, Space, Tooltip } from "antd";
 import { FileTextOutlined, SyncOutlined } from "@ant-design/icons";
 import Title from "antd/es/typography/Title";
 import { AUDIT_LOG_ENDPOINT, AUDIT_LOG_FIELDS } from "./audit-log.const";
+import { timeStamp } from "console";
 
 const columns = fieldsToColumns(fieldsToArray(AUDIT_LOG_FIELDS));
 export default function AuditLogTable({ filters: initialFilters }: TableProps) {
-  const { status } = useSession({ required: true });
+  const { status } = useSession();
   const [data, setData] = useState<PagingResponse>();
   const dispatch = useDispatch();
   const [filters, setFilters] = useState<any>(initialFilters || {});
@@ -26,7 +27,7 @@ export default function AuditLogTable({ filters: initialFilters }: TableProps) {
   const fetchData = async () => {
     dispatch(startLoading());
     await axiosAuth.get(AUDIT_LOG_ENDPOINT, { params: filters }).then((res) => {
-      if (!res) return;
+      // if (!res) return;
       const { items, current, pageSize, pages, totalItem } = res.data.data;
       setData({
         items,
@@ -62,6 +63,7 @@ export default function AuditLogTable({ filters: initialFilters }: TableProps) {
             $or: [
               { username: { $regex: searchValue, $options: "i" } },
               { module: { $regex: searchValue, $options: "i" } },
+              { action: { $regex: searchValue, $options: "i" } },
             ],
           });
           if (newFilters.filter !== filterObj) {
