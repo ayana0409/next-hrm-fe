@@ -38,7 +38,8 @@ export function usePaginationQuery(defaultPageSize: number = 10) {
 }
 
 export const useAxiosAuth = (setIsRefreshing?: (value: boolean) => void) => {
-  const { data: session, status } = useSession({ required: true });
+  const { data: session, status } = useSession();
+  // const { data: session, status } = useSession({ required: true });
   const refreshToken = useRefreshToken();
 
   useEffect(() => {
