@@ -140,13 +140,13 @@ const NotificationModal: React.FC = () => {
                     {item.type && (
                       <Tag
                         color={
-                          item.type === "success"
-                            ? "green"
-                            : item.type === "error"
+                          item.type === "message"
+                            ? "blue"
+                            : item.type === "danger"
                             ? "red"
                             : item.type === "warning"
                             ? "orange"
-                            : "blue"
+                            : "green"
                         }
                       >
                         {item.type.toUpperCase()}
