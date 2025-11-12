@@ -111,9 +111,9 @@ const NotificationModal: React.FC = () => {
         open={visible}
         onCancel={handleClose}
         footer={[
-          <Button key="mark" onClick={markAllAsRead}>
-            Đánh dấu đã đọc tất cả
-          </Button>,
+          // <Button key="mark" onClick={markAllAsRead}>
+          //   Đánh dấu đã đọc tất cả
+          // </Button>,
           <Button key="close" type="primary" onClick={handleClose}>
             Đóng
           </Button>,

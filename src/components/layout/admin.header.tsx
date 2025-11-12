@@ -55,22 +55,24 @@ const AdminHeader = () => {
             height: 64,
           }}
         />
-        <Dropdown menu={{ items }}>
-          <a
-            onClick={(e) => e.preventDefault()}
-            style={{
-              color: "unset",
-              lineHeight: "0 !important",
-              marginRight: 20,
-            }}
-          >
-            <Space>
-              Welcome {session?.user?.username ?? ""}
-              <DownOutlined />
-            </Space>
-          </a>
-        </Dropdown>
-        <NotificationModal />
+        <div className="w-fit flex items-center gap-2">
+          <Dropdown menu={{ items }}>
+            <a
+              onClick={(e) => e.preventDefault()}
+              style={{
+                color: "unset",
+                lineHeight: "0 !important",
+                marginRight: 20,
+              }}
+            >
+              <Space>
+                Welcome {session?.user?.username ?? ""}
+                <DownOutlined />
+              </Space>
+            </a>
+          </Dropdown>
+          <NotificationModal />
+        </div>
       </Header>
     </>
   );
