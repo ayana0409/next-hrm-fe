@@ -5,14 +5,9 @@ The system supports **facial recognition attendance** and other HR modules under
 
 ---
 
-## 📌 Features
+## 📌 Frontend Features
 
 - 👨‍💼 **Employee Management**
-
-  - Add / edit / delete employee profiles
-  - Manage departments, positions, and roles
-  - Search and filter employees
-
 - ⏱️ **Facial Recognition Attendance**
 
   - ML-based face recognition for check-in/out
@@ -23,24 +18,22 @@ The system supports **facial recognition attendance** and other HR modules under
   - Track attendance history
   - Submit and approve/reject leave requests
 
-- 💰 **Payroll Management** _(in progress)_
+- 💰 **Salary Management**
 
   - Salary calculation based on attendance, allowances, bonuses/penalties
   - Export payroll reports
 
-- **Update later**
+- 💰 **Notification Management**
+
+  - Realtime notification
+
+- 💰 **Audit Log**
+
+  - Record all activity on system
 
 ---
 
 ## 🛠️ Tech Stack
-
-### Backend (NestJS)
-
-- Framework: [NestJS](https://nestjs.com/)
-- Database: MongoDB
-- ORM: Mongoose
-- Authentication: JWT
-- ML: Face Recognition (OTensorFlow / face-api.js)
 
 ### Frontend (Next.js)
 
@@ -48,6 +41,7 @@ The system supports **facial recognition attendance** and other HR modules under
 - UI: TailwindCSS / Ant Design
 - State Management: Redux Toolkit
 - API Integration: REST
+- Authentication: NextAuth
 
 ---
 
