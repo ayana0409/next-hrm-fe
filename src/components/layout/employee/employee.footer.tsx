@@ -7,7 +7,7 @@ const EmployeeFooter = () => {
   return (
     <>
       <Footer style={{ textAlign: "center" }}>
-        Nest HRM ©{new Date().getFullYear()} Created by @thuan
+        HRM System ©{new Date().getFullYear()} Created by Dương Đoàn Thuận
       </Footer>
     </>
   );
